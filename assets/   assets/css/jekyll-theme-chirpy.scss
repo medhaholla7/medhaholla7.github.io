@@ -1,1 +1,23 @@
+---
+---
 
+@use "main";
+
+/* Hacker green/cyan accent */
+html[data-mode="dark"],
+html:not([data-mode]) {
+  --link-color: #00e676;
+  --link-underline-color: #00e676;
+  --sidebar-active-color: #00e676;
+  --btn-share-color: #00e676;
+  --heading-color: #7fffd4;
+}
+
+a:hover {
+  color: #39ff14 !important;
+}
+
+/* monospace vibe for code */
+code {
+  color: #00e676;
+}
