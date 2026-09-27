@@ -1,0 +1,17 @@
+---
+---
+
+@use "main";
+
+:root {
+  --link-color: #00e676;
+}
+
+html[data-mode="dark"] {
+  --link-color: #00e676;
+  --heading-color: #7fffd4;
+}
+
+a:hover { color: #39ff14 !important; }
+
+code { color: #00e676; }
