@@ -1,17 +1,23 @@
 ---
 ---
 
-@use "main";
+@use 'abstracts/variables' with (
+  $theme: '{{ site.theme_mode }}'
+);
 
+/* prettier-ignore */
+@use 'main
+{%- if jekyll.environment == 'production' -%}
+  .bundle
+{%- endif -%}
+';
+
+/* ===== custom hacker accent ===== */
 :root {
   --link-color: #00e676;
+  --link-underline-color: #00994d;
 }
 
-html[data-mode="dark"] {
-  --link-color: #00e676;
-  --heading-color: #7fffd4;
-}
-
+a { color: #00e676; }
 a:hover { color: #39ff14 !important; }
-
 code { color: #00e676; }
