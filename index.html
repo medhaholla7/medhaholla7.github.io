@@ -12,26 +12,26 @@
   /* ===== Y2K cyber (default, dark) ===== */
   :root {
     color-scheme: dark;
-    --bg:        #16101a;
-    --bg-2:      #1e1424;
-    --surface:   #271830;
-    --surface-2: #31203b;
-    --border:    #c76bb055;
-    --border-2:  #5a3a5f;
-    --fg:        #ece4ee;
-    --muted:     #c7a9c6;
-    --comment:   #9a80a0;
-    --accent:    #e86bb0;   /* softened pink */
-    --cyan:      #86dfef;
-    --magenta:   #e88fce;
-    --pink:      #e86bb0;
-    --orange:    #e0a074;
-    --glow-cy:   rgb(120 210 230 / 38%);
-    --glow-mg:   rgb(232 107 176 / 42%);
-    --glow-soft: rgb(232 107 176 / 20%);
-    --scan:      0.025;
+    --bg:        #211925;
+    --bg-2:      #29212e;
+    --surface:   #322836;
+    --surface-2: #3d3242;
+    --border:    #e6a6c855;
+    --border-2:  #574452;
+    --fg:        #f0e6ec;
+    --muted:     #cbb2c4;
+    --comment:   #9c8698;
+    --accent:    #f0a6c6;   /* sakura pink */
+    --cyan:      #a9dbe2;
+    --magenta:   #f4bcd8;
+    --pink:      #f0a6c6;
+    --orange:    #e6b48c;
+    --glow-cy:   rgb(169 219 226 / 26%);
+    --glow-mg:   rgb(240 166 198 / 28%);
+    --glow-soft: rgb(240 166 198 / 15%);
+    --scan:      0.02;
     --shadow:    0 14px 44px rgb(0 0 0 / 70%);
-    --chrome: linear-gradient(180deg,#ffffff 0%,#ffd6ef 13%,#ff8fd4 29%,#ff2e9a 46%,#7d0e46 52%,#ff2e9a 59%,#ff8fd4 73%,#ffe3f4 88%,#ffffff 100%);
+    --chrome: linear-gradient(180deg,#fff5fa 0%,#ffe0ef 16%,#f7b8d6 40%,#e87fb2 52%,#a85a80 60%,#f7b8d6 78%,#fff5fa 100%);
   }
   /* ===== One Light ===== */
   :root[data-theme="light"] {
@@ -170,8 +170,8 @@
   /* two-column MySpace layout */
   .layout { max-width: 1160px; margin: 18px auto; padding: 20px; display: grid;
     grid-template-columns: minmax(0, 1fr) 250px; gap: 22px; align-items: start;
-    background: #160611; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border-2));
-    border-radius: 8px; box-shadow: 0 0 0 3px #0c0309, 0 18px 50px rgb(0 0 0 / 55%); }
+    background: #1b1420; border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border-2));
+    border-radius: 8px; box-shadow: 0 0 0 3px #120d16, 0 18px 50px rgb(0 0 0 / 45%); }
   /* MySpace-style extended-network banner */
   .netbar { max-width: 1160px; margin: 18px auto 0; padding: 9px 16px;
     background: linear-gradient(180deg, var(--magenta), var(--accent)); color: #fff;
@@ -232,14 +232,15 @@
   .cert::before { content: "▚"; color: var(--accent); font-size: 12px; opacity: .7; filter: drop-shadow(0 0 6px var(--glow-mg)); }
 
   /* ---- retro window chrome ---- */
-  .win { border: 1px solid color-mix(in srgb, var(--accent) 70%, var(--border-2)); border-radius: 4px; background: #1c0916; box-shadow: var(--shadow), 0 0 0 1px color-mix(in srgb, var(--accent) 18%, transparent); overflow: hidden; }
+  .win { border: 1px solid color-mix(in srgb, var(--accent) 60%, var(--border-2)); border-radius: 4px; background: #2a2130; box-shadow: var(--shadow); overflow: hidden; }
   .titlebar {
     display: flex; align-items: center; gap: 9px; padding: 10px 12px;
-    font-family: "JetBrains Mono", monospace; font-size: 17px; color: #fff;
+    font-family: "JetBrains Mono", monospace; font-size: 17px; color: #3a2634;
     background: linear-gradient(180deg, var(--magenta), var(--accent));
     border-bottom: 1px solid color-mix(in srgb, var(--accent) 60%, black);
   }
-  .titlebar .tb-title { font-weight: 800; letter-spacing: .4px; text-shadow: 0 1px 0 rgb(0 0 0 / 35%); }
+  .titlebar .tb-title { font-weight: 800; letter-spacing: .4px; }
+  .tb-ctrl span { color: #3a2634 !important; }
   .titlebar .pxi { width: 20px; height: 20px; }
   .tb-ctrl { margin-left: auto; display: flex; gap: 4px; }
   .tb-ctrl span { width: 16px; height: 14px; display: grid; place-items: center; font-size: 10px; color: #fff; background: color-mix(in srgb, var(--accent) 55%, black); border: 1px solid rgb(255 255 255 / 45%); border-radius: 2px; }
@@ -402,7 +403,7 @@
     border-top: 1px solid var(--accent); box-shadow: 0 -6px 20px rgb(0 0 0 / 45%);
     font-family: "JetBrains Mono", monospace; font-size: 12px;
   }
-  .startbtn { display: inline-flex; align-items: center; gap: 7px; font-weight: 700; color: #fff;
+  .startbtn { display: inline-flex; align-items: center; gap: 7px; font-weight: 700; color: #3a2634;
     background: linear-gradient(180deg, var(--magenta), var(--accent)); border: 1px solid rgb(255 255 255 / 40%);
     border-radius: 5px; padding: 5px 12px; text-shadow: 0 1px 0 rgb(0 0 0 / 35%); }
   .startbtn .win-ico { width: 12px; height: 12px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 1.5px; }
