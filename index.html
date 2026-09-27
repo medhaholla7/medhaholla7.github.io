@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Medha Holla Security</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  /* ===== Tokyo Night (default, dark) ===== */
+  :root {
+    color-scheme: dark;
+    --bg:        #1a1b26;
+    --bg-dark:   #16161e;
+    --surface:   #1f2233;
+    --surface-2: #232741;
+    --border:    #2b3050;
+    --fg:        #c0caf5;
+    --muted:     #7f88b3;
+    --comment:   #565f89;
+    --accent:    #9ece6a;  /* phosphor green */
+    --blue:      #7aa2f7;
+    --cyan:      #7dcfff;
+    --magenta:   #bb9af7;
+    --red:       #f7768e;
+    --orange:    #ff9e64;
+    --shadow:    0 10px 30px rgb(0 0 0 / 45%);
+  }
+  /* ===== One Light ===== */
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --bg:        #fafafa;
+    --bg-dark:   #eaeaeb;
+    --surface:   #ffffff;
+    --surface-2: #f0f0f1;
+    --border:    #d4d4d6;
+    --fg:        #383a42;
+    --muted:     #6b6d75;
+    --comment:   #a0a1a7;
+    --accent:    #50a14f;
+    --blue:      #4078f2;
+    --cyan:      #0184bc;
+    --magenta:   #a626a4;
+    --red:       #e45649;
+    --orange:    #b76b01;
+    --shadow:    0 10px 30px rgb(60 60 70 / 12%);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: "IBM Plex Sans", system-ui, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace; }
+
+  .wrap { max-width: 860px; margin: 0 auto; padding-inline: 20px; }
+
+  a { color: var(--blue); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ---- top bar ---- */
+  header.bar {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 10;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  .bar .wrap { display: flex; align-items: center; justify-content: space-between; padding-block: 12px; gap: 12px; }
+  .brand { font-family: "JetBrains Mono", monospace; font-weight: 700; font-size: 15px; color: var(--fg); }
+  .brand .prompt { color: var(--accent); }
+  nav.links { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; }
+  nav.links a { color: var(--muted); font-size: 14px; font-family: "JetBrains Mono", monospace; }
+  nav.links a:hover { color: var(--accent); text-decoration: none; }
+  .toggle {
+    font-family: "JetBrains Mono", monospace; font-size: 12px;
+    background: var(--surface); color: var(--muted);
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 5px 9px; cursor: pointer;
+  }
+  .toggle:hover { color: var(--accent); border-color: var(--accent); }
+
+  section { padding-block: 56px; }
+  .eyebrow {
+    font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 14px;
+  }
+  h2 { font-size: 24px; margin: 0 0 22px; text-wrap: balance; letter-spacing: -0.01em; }
+
+  /* ---- hero / terminal ---- */
+  .hero { padding-top: 48px; }
+  .terminal {
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .term-head {
+    display: flex; align-items: center; gap: 8px;
+    padding: 11px 14px; border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .dot { width: 11px; height: 11px; border-radius: 50%; }
+  .dot.r { background: var(--red); } .dot.y { background: var(--orange); } .dot.g { background: var(--accent); }
+  .term-title { margin-left: 8px; font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--comment); }
+  .term-body { padding: 22px 20px 26px; font-family: "JetBrains Mono", monospace; font-size: 14px; }
+  .line { white-space: pre-wrap; }
+  .c-prompt { color: var(--accent); }
+  .c-cmd { color: var(--fg); }
+  .c-comment { color: var(--comment); }
+  .hero-name {
+    font-family: "JetBrains Mono", monospace; font-weight: 700;
+    font-size: clamp(26px, 6vw, 40px); color: var(--fg);
+    margin: 10px 0 4px; letter-spacing: -0.02em;
+  }
+  .hero-role { color: var(--cyan); font-size: clamp(15px, 3.5vw, 18px); margin-bottom: 18px; }
+  .cursor { display: inline-block; width: 9px; height: 1.05em; background: var(--accent); vertical-align: -2px; margin-left: 2px; animation: blink 1.1s steps(1) infinite; }
+  @keyframes blink { 50% { opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .cursor { animation: none; } }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+  .chip {
+    font-family: "JetBrains Mono", monospace; font-size: 12.5px;
+    padding: 7px 11px; border-radius: 999px;
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--muted);
+  }
+  .chip.avail { color: var(--accent); border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
+  .chip.avail b { color: var(--accent); font-weight: 600; }
+
+  /* ---- about ---- */
+  .about p { max-width: 62ch; color: var(--fg); margin: 0 0 14px; }
+  .about .muted { color: var(--muted); }
+
+  /* ---- writeups ---- */
+  .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 620px) { .cards { grid-template-columns: 1fr; } }
+  .card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 18px 16px;
+    display: flex; flex-direction: column; gap: 10px;
+    transition: border-color .15s ease, transform .15s ease;
+  }
+  .card:hover { border-color: color-mix(in srgb, var(--accent) 50%, var(--border)); transform: translateY(-2px); }
+  .card .k {
+    font-family: "JetBrains Mono", monospace; font-size: 11px; letter-spacing: 1px;
+    text-transform: uppercase; color: var(--comment);
+  }
+  .card h3 { margin: 0; font-size: 17px; color: var(--fg); }
+  .card p { margin: 0; font-size: 14px; color: var(--muted); }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+  .tag {
+    font-family: "JetBrains Mono", monospace; font-size: 11px;
+    padding: 3px 8px; border-radius: 5px;
+    background: var(--surface-2); color: var(--blue);
+    border: 1px solid var(--border);
+  }
+
+  /* ---- skills ---- */
+  .skillgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  @media (max-width: 620px) { .skillgrid { grid-template-columns: 1fr; } }
+  .skillcol h4 {
+    margin: 0 0 10px; font-family: "JetBrains Mono", monospace;
+    font-size: 13px; color: var(--accent); font-weight: 500;
+  }
+  .pillset { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill {
+    font-size: 13px; padding: 6px 11px; border-radius: 7px;
+    background: var(--surface); border: 1px solid var(--border); color: var(--fg);
+  }
+
+  /* ---- certs ---- */
+  .certlist { display: flex; flex-direction: column; gap: 10px; }
+  .cert {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 12px 14px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 9px;
+  }
+  .cert .name { color: var(--fg); font-weight: 500; }
+  .status {
+    margin-left: auto; font-family: "JetBrains Mono", monospace; font-size: 11px;
+    padding: 3px 9px; border-radius: 999px; letter-spacing: .5px;
+  }
+  .status.prog { color: var(--orange); border: 1px solid color-mix(in srgb, var(--orange) 45%, var(--border)); }
+  .status.done { color: var(--accent); border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border)); }
+
+  /* ---- contact ---- */
+  .contact-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .copybox {
+    display: inline-flex; align-items: center; gap: 10px;
+    font-family: "JetBrains Mono", monospace; font-size: 14px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 9px 12px; color: var(--fg);
+  }
+  .copybtn {
+    font-family: "JetBrains Mono", monospace; font-size: 11px; cursor: pointer;
+    background: var(--surface-2); color: var(--muted);
+    border: 1px solid var(--border); border-radius: 5px; padding: 3px 8px;
+  }
+  .copybtn:hover { color: var(--accent); border-color: var(--accent); }
+
+  footer {
+    border-top: 1px solid var(--border); padding-block: 26px;
+    font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--comment);
+    text-align: center;
+  }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <span class="brand"><span class="prompt">medha@soc</span>:~$</span>
+    <nav class="links">
+      <a href="#writeups">writeups</a>
+      <a href="#skills">skills</a>
+      <a href="#certs">certs</a>
+      <a href="#contact">contact</a>
+      <button class="toggle" id="themeBtn" aria-label="Toggle theme">One Light</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="wrap">
+      <div class="terminal" role="img" aria-label="Terminal introducing Medha Holla, aspiring SOC analyst">
+        <div class="term-head">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <span class="term-title">medha@soc: ~/intro</span>
+        </div>
+        <div class="term-body">
+          <div class="line"><span class="c-prompt">medha@soc</span>:~$ <span class="c-cmd">whoami</span></div>
+          <div class="hero-name">Medha Holla</div>
+          <div class="hero-role">Aspiring SOC / Security Analyst &nbsp;<span class="c-comment">// blue team</span></div>
+          <div class="line c-comment"># CS student, moving into detection &amp; incident response<span class="cursor" aria-hidden="true"></span></div>
+          <div class="chips">
+            <span class="chip avail"><b>UK-ready</b> · HPI visa, no sponsorship needed for 2 yrs</span>
+            <span class="chip">Open to SOC · Security Analyst · GRC</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="about" id="about">
+    <div class="wrap">
+      <p class="eyebrow">// about</p>
+      <p>I am a computer science student focused on the defensive side of security: reading logs, triaging alerts, and running down what actually happened during an incident. I learn by doing, working through CTF machines and forensic challenges, then writing up exactly how each one was solved.</p>
+      <p class="muted">Most comfortable in a Linux terminal with Wireshark or a SIEM open. Below are recent hands-on writeups, the tools I use, and where I am in my certifications.</p>
+    </div>
+  </section>
+
+  <section id="writeups">
+    <div class="wrap">
+      <p class="eyebrow">// writeups</p>
+      <h2>Recent hands-on work</h2>
+      <div class="cards">
+        <a class="card" href="#">
+          <span class="k">boot2root</span>
+          <h3>Beach Bar</h3>
+          <p>Leaked creds in an HTML comment, YAML deserialization to RCE, then root via a password reused on a service command line.</p>
+          <div class="tags"><span class="tag">web</span><span class="tag">yaml-rce</span><span class="tag">privesc</span></div>
+        </a>
+        <a class="card" href="#">
+          <span class="k">network forensics</span>
+          <h3>Packed Light</h3>
+          <p>Pulled a keylogger's exfil out of a PCAP: XOR-and-base64 data hidden in HTTP cookies, reassembled to recover the flag.</p>
+          <div class="tags"><span class="tag">pcap</span><span class="tag">wireshark</span><span class="tag">crypto</span></div>
+        </a>
+        <a class="card" href="#">
+          <span class="k">recon</span>
+          <h3>Takeover</h3>
+          <p>Subdomain enumeration and TLS certificate analysis to surface a hidden, forgotten host exposed to takeover.</p>
+          <div class="tags"><span class="tag">dns</span><span class="tag">tls-certs</span><span class="tag">osint</span></div>
+        </a>
+        <a class="card" href="#">
+          <span class="k">reversing</span>
+          <h3>Compiled</h3>
+          <p>Static analysis of an ELF binary, past a decoy string, to recover the real password checked by the program.</p>
+          <div class="tags"><span class="tag">reversing</span><span class="tag">elf</span><span class="tag">objdump</span></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section id="skills">
+    <div class="wrap">
+      <p class="eyebrow">// skills</p>
+      <h2>Tools &amp; concepts</h2>
+      <div class="skillgrid">
+        <div class="skillcol">
+          <h4>detection &amp; analysis</h4>
+          <div class="pillset">
+            <span class="pill">Wireshark</span><span class="pill">Splunk</span>
+            <span class="pill">SIEM triage</span><span class="pill">Sigma rules</span>
+            <span class="pill">MITRE ATT&amp;CK</span>
+          </div>
+        </div>
+        <div class="skillcol">
+          <h4>offensive basics</h4>
+          <div class="pillset">
+            <span class="pill">Nmap</span><span class="pill">Gobuster</span>
+            <span class="pill">Burp Suite</span><span class="pill">PortSwigger labs</span>
+          </div>
+        </div>
+        <div class="skillcol">
+          <h4>systems &amp; scripting</h4>
+          <div class="pillset">
+            <span class="pill">Linux</span><span class="pill">Bash</span>
+            <span class="pill">Python</span><span class="pill">Git</span>
+          </div>
+        </div>
+        <div class="skillcol">
+          <h4>process</h4>
+          <div class="pillset">
+            <span class="pill">Alert triage</span><span class="pill">Incident response</span>
+            <span class="pill">Report writing</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="certs">
+    <div class="wrap">
+      <p class="eyebrow">// certifications</p>
+      <h2>In progress</h2>
+      <div class="certlist">
+        <div class="cert"><span class="name">CompTIA Security+</span><span class="status prog">studying</span></div>
+        <div class="cert"><span class="name">Google Cybersecurity Certificate</span><span class="status prog">in progress</span></div>
+        <div class="cert"><span class="name">TryHackMe · SOC Level 1 path</span><span class="status prog">in progress</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact">
+    <div class="wrap">
+      <p class="eyebrow">// contact</p>
+      <h2>Get in touch</h2>
+      <div class="contact-row">
+        <span class="copybox" id="emailBox">medhaholla7@gmail.com
+          <button class="copybtn" id="copyEmail">copy</button>
+        </span>
+        <a class="copybox" href="https://github.com/medhaholla7" style="color:var(--fg)">github.com/medhaholla7</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">built with plain HTML · <span style="color:var(--accent)">medha@soc</span>:~$ exit</div>
+</footer>
+
+<script>
+  // theme toggle: Tokyo Night (default) <-> One Light
+  (function () {
+    var root = document.documentElement, btn = document.getElementById('themeBtn');
+    var KEY = 'mh-theme';
+    function apply(t) {
+      if (t === 'light') { root.setAttribute('data-theme', 'light'); btn.textContent = 'Tokyo Night'; }
+      else { root.removeAttribute('data-theme'); btn.textContent = 'One Light'; }
+    }
+    var saved = null;
+    try { saved = localStorage.getItem(KEY); } catch (e) {}
+    if (saved) apply(saved);
+    btn.addEventListener('click', function () {
+      var next = root.hasAttribute('data-theme') ? 'dark' : 'light';
+      apply(next);
+      try { localStorage.setItem(KEY, next); } catch (e) {}
+    });
+  })();
+
+  // copy email
+  (function () {
+    var btn = document.getElementById('copyEmail');
+    var email = 'medhaholla7@gmail.com';
+    btn.addEventListener('click', function () {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(email).then(function () {
+          btn.textContent = 'copied'; setTimeout(function () { btn.textContent = 'copy'; }, 1400);
+        }).catch(select);
+      } else { select(); }
+      function select() {
+        var r = document.createRange(); r.selectNodeContents(document.getElementById('emailBox').firstChild);
+        var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      }
+    });
+  })();
+</script>
+</body>
+</html>
