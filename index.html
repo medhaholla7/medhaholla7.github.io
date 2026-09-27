@@ -12,23 +12,23 @@
   /* ===== Y2K cyber (default, dark) ===== */
   :root {
     color-scheme: dark;
-    --bg:        #211925;
-    --bg-2:      #29212e;
-    --surface:   #322836;
-    --surface-2: #3d3242;
-    --border:    #e6a6c855;
-    --border-2:  #574452;
-    --fg:        #f0e6ec;
-    --muted:     #cbb2c4;
-    --comment:   #9c8698;
-    --accent:    #f0a6c6;   /* sakura pink */
-    --cyan:      #a9dbe2;
-    --magenta:   #f4bcd8;
-    --pink:      #f0a6c6;
-    --orange:    #e6b48c;
-    --glow-cy:   rgb(169 219 226 / 26%);
-    --glow-mg:   rgb(240 166 198 / 28%);
-    --glow-soft: rgb(240 166 198 / 15%);
+    --bg:        #1d1322;
+    --bg-2:      #251829;
+    --surface:   #301f34;
+    --surface-2: #3c2842;
+    --border:    #f277b055;
+    --border-2:  #5e3c58;
+    --fg:        #f7eef4;
+    --muted:     #d7abc9;
+    --comment:   #a07f96;
+    --accent:    #f277b0;   /* vivid sakura pink */
+    --cyan:      #8fd6df;
+    --magenta:   #f79ccf;
+    --pink:      #f277b0;
+    --orange:    #e8ac7e;
+    --glow-cy:   rgb(143 214 223 / 30%);
+    --glow-mg:   rgb(242 119 176 / 34%);
+    --glow-soft: rgb(242 119 176 / 18%);
     --scan:      0.02;
     --shadow:    0 14px 44px rgb(0 0 0 / 70%);
     --chrome: linear-gradient(180deg,#fff5fa 0%,#ffe0ef 16%,#f7b8d6 40%,#e87fb2 52%,#a85a80 60%,#f7b8d6 78%,#fff5fa 100%);
@@ -170,8 +170,8 @@
   /* two-column MySpace layout */
   .layout { max-width: 1160px; margin: 18px auto; padding: 20px; display: grid;
     grid-template-columns: minmax(0, 1fr) 250px; gap: 22px; align-items: start;
-    background: #1b1420; border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border-2));
-    border-radius: 8px; box-shadow: 0 0 0 3px #120d16, 0 18px 50px rgb(0 0 0 / 45%); }
+    background: #1a1020; border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border-2));
+    border-radius: 8px; box-shadow: 0 0 0 3px #130b17, 0 18px 50px rgb(0 0 0 / 45%); }
   /* MySpace-style extended-network banner */
   .netbar { max-width: 1160px; margin: 18px auto 0; padding: 9px 16px;
     background: linear-gradient(180deg, var(--magenta), var(--accent)); color: #fff;
@@ -232,7 +232,7 @@
   .cert::before { content: "▚"; color: var(--accent); font-size: 12px; opacity: .7; filter: drop-shadow(0 0 6px var(--glow-mg)); }
 
   /* ---- retro window chrome ---- */
-  .win { border: 1px solid color-mix(in srgb, var(--accent) 60%, var(--border-2)); border-radius: 4px; background: #2a2130; box-shadow: var(--shadow); overflow: hidden; }
+  .win { border: 1px solid color-mix(in srgb, var(--accent) 60%, var(--border-2)); border-radius: 4px; background: #2a1b30; box-shadow: var(--shadow); overflow: hidden; }
   .titlebar {
     display: flex; align-items: center; gap: 9px; padding: 10px 12px;
     font-family: "JetBrains Mono", monospace; font-size: 17px; color: #3a2634;
