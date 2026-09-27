@@ -168,7 +168,9 @@
   .titlebar .tb-title { text-transform: lowercase; }
   /* two-column MySpace layout */
   .layout { max-width: 1180px; margin: 0 auto; padding: 0 20px; display: grid;
-    grid-template-columns: 250px minmax(0, 1fr); gap: 22px; align-items: start; }
+    grid-template-columns: minmax(0, 1fr) 250px; gap: 22px; align-items: start; }
+  .sidebar { grid-column: 2; }
+  .maincol { grid-column: 1; }
   .maincol { min-width: 0; }
   .maincol .wrap { max-width: none; margin: 0; padding-inline: 0; }
   .maincol section { padding-block: 18px; }
@@ -194,7 +196,8 @@
   @keyframes eqb { 0%,100% { height: 6px; } 50% { height: 24px; } }
   .toybox { display: flex; align-items: center; justify-content: space-around; padding: 14px 10px; }
   @media (prefers-reduced-motion: reduce) { .eq i { animation: none; height: 15px; } }
-  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; order: 2; } }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; }
+    .sidebar { position: static; grid-column: 1; order: 2; } .maincol { grid-column: 1; order: 1; } }
   .eyebrow {
     font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: 2px;
     text-transform: uppercase; color: var(--accent); margin: 0 0 14px;
