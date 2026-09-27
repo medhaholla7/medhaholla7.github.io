@@ -123,7 +123,7 @@
   @media (prefers-reduced-motion: reduce) { body::after { display: none; } }
 
   .mono { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; }
-  .wrap { max-width: 920px; margin: 0 auto; padding-inline: 20px; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; }
   a { color: var(--cyan); text-decoration: none; }
   a:hover { text-decoration: underline; }
 
@@ -166,6 +166,35 @@
   .mod-body { padding: 18px 18px 20px; }
   .titlebar .pxi { width: 16px; height: 16px; margin-right: 2px; }
   .titlebar .tb-title { text-transform: lowercase; }
+  /* two-column MySpace layout */
+  .layout { max-width: 1180px; margin: 0 auto; padding: 0 20px; display: grid;
+    grid-template-columns: 250px minmax(0, 1fr); gap: 22px; align-items: start; }
+  .maincol { min-width: 0; }
+  .maincol .wrap { max-width: none; margin: 0; padding-inline: 0; }
+  .maincol section { padding-block: 18px; }
+  .maincol .hero { padding-top: 6px; }
+  .sidebar { position: sticky; top: 64px; display: flex; flex-direction: column; gap: 16px; }
+  .sb-body { padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .sb-row { display: flex; align-items: center; justify-content: space-between;
+    font-family: "JetBrains Mono", monospace; font-size: 12px; }
+  .sb-row .k { color: var(--cyan); text-transform: uppercase; letter-spacing: .5px; }
+  .sb-row .v { color: var(--fg); }
+  .sb-row .v.hot { color: var(--accent); }
+  .sb-link { display: flex; align-items: center; gap: 8px; font-family: "JetBrains Mono", monospace;
+    font-size: 12.5px; color: var(--fg); border: 1px solid var(--border-2); border-radius: 6px;
+    padding: 8px 9px; background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+  .sb-link:hover { text-decoration: none; border-color: var(--accent); box-shadow: 0 0 12px var(--glow-soft); transform: translateX(2px); }
+  .sb-link .i { color: var(--accent); width: 16px; text-align: center; }
+  .eq { display: flex; align-items: flex-end; gap: 3px; height: 26px; margin: 2px 0 4px; }
+  .eq i { width: 5px; height: 6px; background: linear-gradient(var(--cyan), var(--accent)); border-radius: 1px;
+    animation: eqb 1s ease-in-out infinite; }
+  .eq i:nth-child(2){ animation-delay:.2s } .eq i:nth-child(3){ animation-delay:.45s }
+  .eq i:nth-child(4){ animation-delay:.1s } .eq i:nth-child(5){ animation-delay:.32s }
+  .eq i:nth-child(6){ animation-delay:.5s } .eq i:nth-child(7){ animation-delay:.15s }
+  @keyframes eqb { 0%,100% { height: 6px; } 50% { height: 24px; } }
+  .toybox { display: flex; align-items: center; justify-content: space-around; padding: 14px 10px; }
+  @media (prefers-reduced-motion: reduce) { .eq i { animation: none; height: 15px; } }
+  @media (max-width: 900px) { .layout { grid-template-columns: 1fr; } .sidebar { position: static; order: 2; } }
   .eyebrow {
     font-family: "JetBrains Mono", monospace; font-size: 12px; letter-spacing: 2px;
     text-transform: uppercase; color: var(--accent); margin: 0 0 14px;
@@ -443,20 +472,6 @@
   <div class="rail"><span>◍</span><span>♡</span><span>✦</span><span>◈</span><span>▦</span></div>
   <span class="float f1">♡</span><span class="float f2">✦</span><span class="float f3">✧</span><span class="float f4">♡</span><span class="float f5">✦</span>
 </div>
-<div class="side l" aria-hidden="true">
-  <div class="divider"></div>
-  <svg class="stk crt" width="66" height="58" viewBox="0 0 66 58" fill="none"><rect x="7" y="4" width="52" height="40" rx="4" fill="#2e0f26" stroke="#ff45ad" stroke-width="2"/><rect class="crt-scr" x="12" y="9" width="42" height="28" rx="2" fill="#180611" stroke="#7cf0ff" stroke-width="1"/><rect x="16" y="14" width="16" height="2" fill="#ff7ad6"/><rect x="16" y="19" width="24" height="2" fill="#7cf0ff"/><rect x="16" y="24" width="11" height="2" fill="#ff7ad6"/><rect class="crt-cur" x="30" y="24" width="4" height="2" fill="#7cf0ff"/><rect x="27" y="44" width="12" height="6" fill="#2e0f26" stroke="#ff45ad" stroke-width="1.6"/><rect x="19" y="50" width="28" height="3" rx="1" fill="#ff45ad"/></svg>
-  <svg class="stk cd" width="50" height="50" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="22" stroke="#ff45ad" stroke-width="2"/><circle cx="24" cy="24" r="15" stroke="#7cf0ff" stroke-width="1"/><path d="M24 2 a22 22 0 0 1 20 14" stroke="#7cf0ff" stroke-width="2.4" opacity=".7"/><circle cx="24" cy="24" r="5" fill="#180611" stroke="#ff7ad6" stroke-width="1.5"/></svg>
-  <svg class="stk floppy" width="46" height="46" viewBox="0 0 44 44" fill="none"><rect x="4" y="4" width="36" height="36" rx="2" fill="#2e0f26" stroke="#7cf0ff" stroke-width="2"/><rect x="12" y="4" width="20" height="12" fill="#ff45ad"/><rect x="24" y="6" width="5" height="8" fill="#180611"/><rect x="10" y="22" width="24" height="14" fill="none" stroke="#ff7ad6" stroke-width="1.4"/></svg>
-  <svg class="stk hpx" width="40" height="36" viewBox="0 0 40 36" fill="none"><path d="M20 34 C6 24 2 14 9 8 C13 5 18 8 20 13 C22 8 27 5 31 8 C38 14 34 24 20 34 Z" fill="#ff45ad" stroke="#ffb8de" stroke-width="1.4"/></svg>
-</div>
-<div class="side r" aria-hidden="true">
-  <div class="divider"></div>
-  <svg class="stk floppy" width="46" height="46" viewBox="0 0 44 44" fill="none"><rect x="4" y="4" width="36" height="36" rx="2" fill="#2e0f26" stroke="#ff45ad" stroke-width="2"/><rect x="12" y="4" width="20" height="12" fill="#7cf0ff"/><rect x="24" y="6" width="5" height="8" fill="#180611"/><rect x="10" y="22" width="24" height="14" fill="none" stroke="#7cf0ff" stroke-width="1.4"/></svg>
-  <svg class="stk hpx" width="40" height="36" viewBox="0 0 40 36" fill="none"><path d="M20 34 C6 24 2 14 9 8 C13 5 18 8 20 13 C22 8 27 5 31 8 C38 14 34 24 20 34 Z" fill="none" stroke="#7cf0ff" stroke-width="2"/></svg>
-  <svg class="stk cd" width="50" height="50" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="22" stroke="#7cf0ff" stroke-width="2"/><circle cx="24" cy="24" r="15" stroke="#ff45ad" stroke-width="1"/><path d="M24 2 a22 22 0 0 1 20 14" stroke="#ff7ad6" stroke-width="2.4" opacity=".7"/><circle cx="24" cy="24" r="5" fill="#180611" stroke="#ff7ad6" stroke-width="1.5"/></svg>
-  <svg class="stk crt" width="66" height="58" viewBox="0 0 66 58" fill="none"><rect x="7" y="4" width="52" height="40" rx="4" fill="#2e0f26" stroke="#ff45ad" stroke-width="2"/><rect class="crt-scr" x="12" y="9" width="42" height="28" rx="2" fill="#180611" stroke="#ff7ad6" stroke-width="1"/><rect x="16" y="14" width="22" height="2" fill="#7cf0ff"/><rect x="16" y="19" width="14" height="2" fill="#ff7ad6"/><rect x="16" y="24" width="20" height="2" fill="#7cf0ff"/><rect x="27" y="44" width="12" height="6" fill="#2e0f26" stroke="#ff45ad" stroke-width="1.6"/><rect x="19" y="50" width="28" height="3" rx="1" fill="#ff45ad"/></svg>
-</div>
 <div class="cat-run" aria-hidden="true">
   <div class="cat-face">
     <svg class="cat" viewBox="0 0 72 50" fill="none">
@@ -510,7 +525,45 @@
   </div>
 </header>
 
-<main>
+<main class="layout">
+  <aside class="sidebar">
+    <div class="win">
+      <div class="titlebar"><span class="tb-title">now_playing</span><span class="tb-ctrl"><span>_</span><span>▢</span><span>✕</span></span></div>
+      <div class="sb-body">
+        <div class="eq"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="sb-row"><span class="k">mode</span><span class="v">focus / triage</span></div>
+        <div class="sb-row"><span class="k">status</span><span class="v hot">online</span></div>
+        <div class="sb-row"><span class="k">sydney</span><span class="v" id="sbClock">--:--</span></div>
+      </div>
+    </div>
+    <div class="win">
+      <div class="titlebar"><span class="tb-title">stats.dat</span><span class="tb-ctrl"><span>_</span><span>▢</span><span>✕</span></span></div>
+      <div class="sb-body">
+        <div class="sb-row"><span class="k">writeups</span><span class="v">04</span></div>
+        <div class="sb-row"><span class="k">certs</span><span class="v">03 in prog</span></div>
+        <div class="sb-row"><span class="k">focus</span><span class="v">blue team</span></div>
+        <div class="sb-row"><span class="k">visa</span><span class="v hot">UK-ready</span></div>
+      </div>
+    </div>
+    <div class="win">
+      <div class="titlebar"><span class="tb-title">find_me</span><span class="tb-ctrl"><span>_</span><span>▢</span><span>✕</span></span></div>
+      <div class="sb-body">
+        <a class="sb-link" href="https://www.linkedin.com/in/medhaholla77/"><span class="i">in</span> LinkedIn</a>
+        <a class="sb-link" href="https://github.com/medhaholla7"><span class="i">›_</span> GitHub</a>
+        <a class="sb-link" href="https://wa.me/61430783076?text=Hi%20Medha%2C"><span class="i">✆</span> WhatsApp</a>
+        <a class="sb-link" href="mailto:medhaholla7@gmail.com"><span class="i">✉</span> Email</a>
+      </div>
+    </div>
+    <div class="win">
+      <div class="titlebar"><span class="tb-title">toys.exe</span><span class="tb-ctrl"><span>_</span><span>▢</span><span>✕</span></span></div>
+      <div class="toybox">
+        <svg class="stk cd" width="40" height="40" viewBox="0 0 48 48" fill="none"><circle cx="24" cy="24" r="22" stroke="#ff45ad" stroke-width="2"/><circle cx="24" cy="24" r="15" stroke="#7cf0ff" stroke-width="1"/><path d="M24 2 a22 22 0 0 1 20 14" stroke="#7cf0ff" stroke-width="2.4" opacity=".7"/><circle cx="24" cy="24" r="5" fill="#180611" stroke="#ff7ad6" stroke-width="1.5"/></svg>
+        <svg class="stk floppy" width="38" height="38" viewBox="0 0 44 44" fill="none"><rect x="4" y="4" width="36" height="36" rx="2" fill="#2e0f26" stroke="#7cf0ff" stroke-width="2"/><rect x="12" y="4" width="20" height="12" fill="#ff45ad"/><rect x="24" y="6" width="5" height="8" fill="#180611"/><rect x="10" y="22" width="24" height="14" fill="none" stroke="#ff7ad6" stroke-width="1.4"/></svg>
+        <svg class="stk hpx" width="34" height="30" viewBox="0 0 40 36" fill="none"><path d="M20 34 C6 24 2 14 9 8 C13 5 18 8 20 13 C22 8 27 5 31 8 C38 14 34 24 20 34 Z" fill="#ff45ad" stroke="#ffb8de" stroke-width="1.4"/></svg>
+      </div>
+    </div>
+  </aside>
+  <div class="maincol">
   <section class="hero">
     <div class="wrap">
       <div class="titleblock">
@@ -700,6 +753,7 @@
       </div>
     </div>
   </section>
+  </div>
 </main>
 
 <footer>
@@ -751,11 +805,12 @@
   })();
 
   (function () {
-    var c = document.getElementById('clock');
+    var c = document.getElementById('clock'), sb = document.getElementById('sbClock');
     function tick() {
       var d = new Date(), h = d.getHours(), m = d.getMinutes();
       var ap = h < 12 ? 'AM' : 'PM'; h = h % 12; if (h === 0) h = 12;
-      c.textContent = (h < 10 ? '0' + h : h) + ':' + (m < 10 ? '0' + m : m) + ' ' + ap;
+      var t = (h < 10 ? '0' + h : h) + ':' + (m < 10 ? '0' + m : m) + ' ' + ap;
+      if (c) c.textContent = t; if (sb) sb.textContent = t;
     }
     tick(); setInterval(tick, 15000);
     var dt = document.getElementById('cdate');
