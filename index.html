@@ -12,10 +12,10 @@
   /* ===== Y2K cyber (default, dark) ===== */
   :root {
     color-scheme: dark;
-    --bg:        #1d1322;
-    --bg-2:      #251829;
-    --surface:   #301f34;
-    --surface-2: #3c2842;
+    --bg:        #0b0810;
+    --bg-2:      #120c17;
+    --surface:   #1a1220;
+    --surface-2: #241830;
     --border:    #f277b055;
     --border-2:  #5e3c58;
     --fg:        #f7eef4;
@@ -171,8 +171,8 @@
   /* two-column MySpace layout */
   .layout { max-width: 1160px; margin: 18px auto; padding: 20px; display: grid;
     grid-template-columns: minmax(0, 1fr) 250px; gap: 22px; align-items: start;
-    background: #1a1020; border: 1px solid color-mix(in srgb, var(--accent) 40%, var(--border-2));
-    border-radius: 8px; box-shadow: 0 0 0 3px #130b17, 0 18px 50px rgb(0 0 0 / 45%); }
+    background: #0a0710; border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border-2));
+    border-radius: 8px; box-shadow: 0 0 0 3px #060409, 0 18px 50px rgb(0 0 0 / 55%); }
   /* MySpace-style extended-network banner */
   .netbar { max-width: 1160px; margin: 18px auto 0; padding: 9px 16px;
     background: linear-gradient(180deg, var(--magenta), var(--accent)); color: #fff;
@@ -233,7 +233,7 @@
   .cert::before { content: "▚"; color: var(--accent); font-size: 12px; opacity: .7; filter: drop-shadow(0 0 6px var(--glow-mg)); }
 
   /* ---- retro window chrome ---- */
-  .win { border: 1px solid var(--border-2); border-radius: 4px; background: #241830; box-shadow: var(--shadow), inset 1px 1px 0 rgb(255 255 255 / 7%), inset -1px -1px 0 rgb(0 0 0 / 45%); overflow: hidden; }
+  .win { border: 1px solid var(--border-2); border-radius: 4px; background: #100b16; box-shadow: var(--shadow), inset 1px 1px 0 rgb(255 255 255 / 6%), inset -1px -1px 0 rgb(0 0 0 / 50%); overflow: hidden; }
   /* early-2000s scrolling status ticker */
   .ticker { max-width: 1160px; margin: 14px auto 0; overflow: hidden; white-space: nowrap;
     border: 1px solid var(--border-2); border-radius: 6px; background: #120b16;
@@ -254,15 +254,12 @@
     letter-spacing: 1px; color: var(--comment); padding: 0 0 10px; text-transform: uppercase; }
   .titlebar {
     display: flex; align-items: center; gap: 9px; padding: 10px 12px;
-    font-family: "JetBrains Mono", monospace; font-size: 16px; color: var(--cyan);
-    background: linear-gradient(180deg, #241a2e, #170f1d);
-    border-bottom: 2px solid var(--accent);
+    font-family: "JetBrains Mono", monospace; font-size: 17px; color: #331f2e;
+    background: linear-gradient(180deg, var(--magenta), var(--accent));
+    border-bottom: 1px solid color-mix(in srgb, var(--accent) 60%, black);
   }
-  .titlebar::before { content: ""; width: 9px; height: 9px; border-radius: 50%;
-    background: var(--cyan); box-shadow: 0 0 6px var(--glow-cy); flex: none; }
-  .titlebar .tb-title { font-weight: 800; letter-spacing: .5px; color: var(--cyan); }
-  .titlebar .tb-title::before { content: "> "; color: var(--accent); font-weight: 700; }
-  .tb-ctrl span { color: var(--muted) !important; background: transparent !important; border-color: var(--border-2) !important; }
+  .titlebar .tb-title { font-weight: 800; letter-spacing: .4px; }
+  .tb-ctrl span { color: #331f2e !important; }
   .titlebar .pxi { width: 20px; height: 20px; }
   .tb-ctrl { margin-left: auto; display: flex; gap: 4px; }
   .tb-ctrl span { width: 16px; height: 14px; display: grid; place-items: center; font-size: 10px; color: #fff; background: color-mix(in srgb, var(--accent) 55%, black); border: 1px solid rgb(255 255 255 / 45%); border-radius: 2px; }
