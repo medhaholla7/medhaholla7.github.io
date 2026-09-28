@@ -233,7 +233,7 @@
   .cert::before { content: "▚"; color: var(--accent); font-size: 12px; opacity: .7; filter: drop-shadow(0 0 6px var(--glow-mg)); }
 
   /* ---- retro window chrome ---- */
-  .win { border: 1px solid color-mix(in srgb, var(--accent) 60%, var(--border-2)); border-radius: 4px; background: #2a1b30; box-shadow: var(--shadow), inset 1px 1px 0 rgb(255 255 255 / 9%), inset -1px -1px 0 rgb(0 0 0 / 45%); overflow: hidden; }
+  .win { border: 1px solid var(--border-2); border-radius: 4px; background: #241830; box-shadow: var(--shadow), inset 1px 1px 0 rgb(255 255 255 / 7%), inset -1px -1px 0 rgb(0 0 0 / 45%); overflow: hidden; }
   /* early-2000s scrolling status ticker */
   .ticker { max-width: 1160px; margin: 14px auto 0; overflow: hidden; white-space: nowrap;
     border: 1px solid var(--border-2); border-radius: 6px; background: #120b16;
@@ -254,12 +254,15 @@
     letter-spacing: 1px; color: var(--comment); padding: 0 0 10px; text-transform: uppercase; }
   .titlebar {
     display: flex; align-items: center; gap: 9px; padding: 10px 12px;
-    font-family: "JetBrains Mono", monospace; font-size: 17px; color: #3a2634;
-    background: linear-gradient(180deg, var(--magenta), var(--accent));
-    border-bottom: 1px solid color-mix(in srgb, var(--accent) 60%, black);
+    font-family: "JetBrains Mono", monospace; font-size: 16px; color: var(--cyan);
+    background: linear-gradient(180deg, #241a2e, #170f1d);
+    border-bottom: 2px solid var(--accent);
   }
-  .titlebar .tb-title { font-weight: 800; letter-spacing: .4px; }
-  .tb-ctrl span { color: #3a2634 !important; }
+  .titlebar::before { content: ""; width: 9px; height: 9px; border-radius: 50%;
+    background: var(--cyan); box-shadow: 0 0 6px var(--glow-cy); flex: none; }
+  .titlebar .tb-title { font-weight: 800; letter-spacing: .5px; color: var(--cyan); }
+  .titlebar .tb-title::before { content: "> "; color: var(--accent); font-weight: 700; }
+  .tb-ctrl span { color: var(--muted) !important; background: transparent !important; border-color: var(--border-2) !important; }
   .titlebar .pxi { width: 20px; height: 20px; }
   .tb-ctrl { margin-left: auto; display: flex; gap: 4px; }
   .tb-ctrl span { width: 16px; height: 14px; display: grid; place-items: center; font-size: 10px; color: #fff; background: color-mix(in srgb, var(--accent) 55%, black); border: 1px solid rgb(255 255 255 / 45%); border-radius: 2px; }
