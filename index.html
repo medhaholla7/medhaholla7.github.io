@@ -233,7 +233,25 @@
   .cert::before { content: "▚"; color: var(--accent); font-size: 12px; opacity: .7; filter: drop-shadow(0 0 6px var(--glow-mg)); }
 
   /* ---- retro window chrome ---- */
-  .win { border: 1px solid color-mix(in srgb, var(--accent) 60%, var(--border-2)); border-radius: 4px; background: #2a1b30; box-shadow: var(--shadow); overflow: hidden; }
+  .win { border: 1px solid color-mix(in srgb, var(--accent) 60%, var(--border-2)); border-radius: 4px; background: #2a1b30; box-shadow: var(--shadow), inset 1px 1px 0 rgb(255 255 255 / 9%), inset -1px -1px 0 rgb(0 0 0 / 45%); overflow: hidden; }
+  /* early-2000s scrolling status ticker */
+  .ticker { max-width: 1160px; margin: 14px auto 0; overflow: hidden; white-space: nowrap;
+    border: 1px solid var(--border-2); border-radius: 6px; background: #120b16;
+    font-family: "JetBrains Mono", monospace; font-size: 12.5px; color: var(--cyan);
+    padding: 6px 0; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 40%); }
+  @media (max-width: 1200px) { .ticker { margin-left: 12px; margin-right: 12px; } }
+  .ticker b { display: inline-block; padding-left: 100%; animation: tickscroll 26s linear infinite; }
+  .ticker .hi { color: var(--accent); }
+  @keyframes tickscroll { to { transform: translateX(-100%); } }
+  .ticker:hover b { animation-play-state: paused; }
+  @media (prefers-reduced-motion: reduce) { .ticker b { animation: none; padding-left: 12px; } }
+  /* leet visitor counter (LCD odometer) */
+  .counter { display: flex; gap: 3px; justify-content: center; padding: 12px; }
+  .counter span { font-family: "JetBrains Mono", monospace; font-weight: 800; font-size: 20px;
+    color: #7dffb0; background: #0a0d0a; border: 1px solid #1c3a24; border-radius: 3px;
+    padding: 4px 6px; text-shadow: 0 0 6px rgb(125 255 176 / 55%); }
+  .counter-lbl { text-align: center; font-family: "JetBrains Mono", monospace; font-size: 10.5px;
+    letter-spacing: 1px; color: var(--comment); padding: 0 0 10px; text-transform: uppercase; }
   .titlebar {
     display: flex; align-items: center; gap: 9px; padding: 10px 12px;
     font-family: "JetBrains Mono", monospace; font-size: 17px; color: #3a2634;
@@ -549,6 +567,8 @@
   </div>
 </header>
 
+<div class="ticker" aria-hidden="true"><b><span class="hi">✦</span> available for SOC / security analyst roles &nbsp;<span class="hi">✦</span> UK HPI visa, no sponsorship needed &nbsp;<span class="hi">✦</span> now solving Pointer Overflow CTF &nbsp;19/273 &nbsp;<span class="hi">✦</span> Security+ in progress &nbsp;<span class="hi">✦</span> blue team &nbsp;detection &nbsp;incident response &nbsp;<span class="hi">✦</span></b></div>
+
 <main class="layout">
   <aside class="sidebar">
     <div class="win">
@@ -568,6 +588,11 @@
         <a class="sb-link" href="https://wa.me/61430783076?text=Hi%20Medha%2C"><span class="i">✆</span> WhatsApp</a>
         <a class="sb-link" href="mailto:medhaholla7@gmail.com"><span class="i">✉</span> Email</a>
       </div>
+    </div>
+    <div class="win">
+      <div class="titlebar"><span class="tb-title">visitors</span><span class="tb-ctrl"><span>_</span><span>▢</span><span>✕</span></span></div>
+      <div class="counter" aria-hidden="true"><span>0</span><span>0</span><span>1</span><span>3</span><span>3</span><span>7</span></div>
+      <div class="counter-lbl">you are visitor #1337</div>
     </div>
     <div class="win">
       <div class="titlebar"><span class="tb-title">toys.exe</span><span class="tb-ctrl"><span>_</span><span>▢</span><span>✕</span></span></div>
@@ -818,7 +843,7 @@
 </main>
 
 <footer>
-  <div class="wrap">© 2026 Medha Holla · <a href="https://github.com/medhaholla7">github.com/medhaholla7</a></div>
+  <div class="wrap">best viewed at 1024×768 · made with ♥ in Sydney · © 2026 Medha Holla · <a href="https://github.com/medhaholla7">github.com/medhaholla7</a></div>
 </footer>
 
 <div class="taskbar" aria-hidden="true">
