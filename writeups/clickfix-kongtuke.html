@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Incident report: investigating a KongTuke ClickFix malware infection in an Active Directory network using Wireshark.">
+<title>ClickFix Infection Investigation | Medha Holla</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Orbitron:wght@700;800;900&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<script>
+  (function () { try { var t = localStorage.getItem('mh-theme'); if (t === 'light') document.documentElement.setAttribute('data-theme', 'light'); } catch (e) {} })();
+</script>
+<style>
+  :root {
+    color-scheme: dark;
+    --bg: #000000; --bg-2: #0a0710; --surface: #1a1220; --surface-2: #241830;
+    --border-2: #5e3c58; --fg: #f7eef4; --muted: #d7abc9; --comment: #a07f96;
+    --accent: #f277b0; --cyan: #8fd6df; --magenta: #f79ccf; --orange: #e8ac7e;
+    --glow-cy: rgb(143 214 223 / 30%); --glow-mg: rgb(242 119 176 / 34%); --glow-soft: rgb(242 119 176 / 18%);
+    --win-bg: #100b16; --code-bg: #0c0810;
+    --shadow: 0 14px 44px rgb(0 0 0 / 70%);
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --bg: #fafafa; --bg-2: #f2f2f4; --surface: #ffffff; --surface-2: #f7eef4;
+    --border-2: #e4c3d6; --fg: #2c1622; --muted: #7a4462; --comment: #a87893;
+    --accent: #d6156c; --cyan: #0184bc; --magenta: #d6156c; --orange: #b76b01;
+    --glow-cy: rgb(1 132 188 / 20%); --glow-mg: rgb(214 21 108 / 20%); --glow-soft: rgb(214 21 108 / 12%);
+    --win-bg: #ffffff; --code-bg: #f7eef4;
+    --shadow: 0 12px 34px rgb(60 60 70 / 12%);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 16px; line-height: 1.65; }
+  a { color: var(--cyan); text-decoration: none; }
+  a:hover { color: var(--accent); text-decoration: underline; }
+  .mono, code, pre, .brand, .links, .kicker, .meta, th { font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; }
+  .wrap { max-width: 900px; margin: 0 auto; padding-inline: 16px; }
+
+  header.bar { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(6px); border-bottom: 1px solid var(--border-2); }
+  header.bar .wrap { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-block: 12px; }
+  .brand { font-size: 13px; color: var(--fg); }
+  .brand .prompt { color: var(--accent); }
+  .links { display: flex; align-items: center; gap: 14px; font-size: 13px; }
+  .links a { color: var(--muted); }
+  .toggle { font-family: "JetBrains Mono", monospace; font-size: 12px; color: var(--muted); background: transparent; border: 1px solid var(--border-2); border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+  .toggle:hover { color: var(--cyan); border-color: var(--cyan); box-shadow: 0 0 14px var(--glow-cy); }
+
+  .hero { padding: 40px 0 16px; }
+  .kicker { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--magenta); margin-bottom: 10px; }
+  h1 { font-family: "Orbitron", sans-serif; font-weight: 900; font-size: clamp(26px, 5vw, 40px); line-height: 1.15; margin: 0 0 14px; color: var(--fg); text-shadow: 0 0 22px var(--glow-soft); }
+  .meta { font-size: 12.5px; color: var(--comment); display: flex; flex-wrap: wrap; gap: 8px 16px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+  .tag { font-family: "JetBrains Mono", monospace; font-size: 11px; padding: 3px 8px; border-radius: 4px; background: var(--surface-2); color: var(--cyan); border: 1px solid var(--border-2); }
+
+  .win { border: 1px solid var(--border-2); border-radius: 4px; background: var(--win-bg); box-shadow: var(--shadow); overflow: hidden; margin: 22px 0; }
+  .titlebar { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; font-family: "JetBrains Mono", monospace; font-size: 14px; font-weight: 800; color: #331f2e; background: linear-gradient(180deg, var(--magenta), var(--accent)); }
+  .titlebar .ctrl { letter-spacing: 6px; font-weight: 700; }
+  .mod-body { padding: 18px 20px 20px; }
+  .mod-body > :first-child { margin-top: 0; }
+  .mod-body > :last-child { margin-bottom: 0; }
+
+  h2 { font-family: "JetBrains Mono", monospace; font-size: 15px; letter-spacing: .5px; color: var(--accent); margin: 0; }
+  h3 { font-family: "JetBrains Mono", monospace; font-size: 15px; color: var(--fg); margin: 22px 0 6px; }
+  p { margin: 0 0 12px; color: var(--fg); }
+  .muted { color: var(--muted); }
+  ul, ol { margin: 0 0 12px; padding-left: 22px; }
+  li { margin-bottom: 6px; }
+
+  code { font-size: 13px; background: var(--code-bg); border: 1px solid var(--border-2); border-radius: 4px; padding: 1px 6px; color: var(--cyan); }
+  pre { background: var(--code-bg); border: 1px solid var(--border-2); border-radius: 6px; padding: 12px 14px; overflow-x: auto; font-size: 13px; color: var(--cyan); margin: 8px 0 14px; }
+  pre code { border: 0; padding: 0; background: none; }
+
+  .tbl { width: 100%; overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border-2); vertical-align: top; }
+  th { font-size: 12px; color: var(--magenta); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+  td.mono { font-size: 13px; color: var(--cyan); word-break: break-all; }
+  .time { white-space: nowrap; font-family: "JetBrains Mono", monospace; font-size: 13px; color: var(--orange); }
+
+  .callout { border-left: 3px solid var(--accent); background: var(--surface-2); padding: 12px 14px; border-radius: 0 6px 6px 0; margin: 12px 0; }
+  .callout p:last-child { margin: 0; }
+
+  footer { padding: 28px 0 48px; color: var(--comment); font-size: 13px; }
+  footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; font-family: "JetBrains Mono", monospace; }
+  @media (max-width: 560px) { .links a.hide-sm { display: none; } .mod-body { padding: 16px 14px; } }
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span class="prompt">medha@soc</span>:~$</a>
+    <nav class="links">
+      <a href="../index.html#writeups">writeups</a>
+      <a class="hide-sm" href="../index.html#contact">contact</a>
+      <button class="toggle" id="themeBtn" aria-label="Toggle theme">One Light</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section class="hero">
+    <div class="kicker">incident report · network forensics</div>
+    <h1>Investigating a ClickFix Malware Infection with Wireshark</h1>
+    <div class="meta">
+      <span>Medha Holla</span>
+      <span>Evidence: packet capture (pcap), 73,779 packets, 21 minutes</span>
+      <span>Source: malware-traffic-analysis.net exercise, 11 Sep 2026</span>
+    </div>
+    <div class="tags">
+      <span class="tag">wireshark</span><span class="tag">clickfix</span><span class="tag">kongtuke</span>
+      <span class="tag">active-directory</span><span class="tag">kerberos</span><span class="tag">c2-beaconing</span>
+    </div>
+  </section>
+
+  <div class="win">
+    <div class="titlebar"><span>summary.txt</span><span class="ctrl">_▢✕</span></div>
+    <div class="mod-body">
+      <p>A Windows workstation in the <code>overhands[.]org</code> Active Directory domain was infected after its user visited a website that served a fake "verify you are human" page. The page used the ClickFix technique: it tricked the user into pasting a malicious command into the Windows Run box.</p>
+      <p>From the packet capture I identified the infected host (<code>DESKTOP-6T17ZFM</code>, user <code>gmcdowell</code>), reconstructed the infection chain, and found the malware beaconing to a command-and-control (C2) server every 10 seconds, including one 4.4 MB upload that is likely stolen data.</p>
+      <p><strong>Verdict:</strong> confirmed compromise. The host should be isolated and the user's credentials treated as stolen.</p>
+    </div>
+  </div>
+
+  <div class="win">
+    <div class="titlebar"><span>scenario.txt</span><span class="ctrl">_▢✕</span></div>
+    <div class="mod-body">
+      <p>I was given a single pcap from the infected machine and these details about the network:</p>
+      <div class="tbl"><table>
+        <tr><th>Item</th><th>Value</th></tr>
+        <tr><td>LAN range</td><td class="mono">10.9.11[.]0/24</td></tr>
+        <tr><td>Domain / AD name</td><td class="mono">overhands[.]org / OVERHANDS</td></tr>
+        <tr><td>Domain controller</td><td class="mono">10.9.11[.]2 (WIN-GTWXC9UYSE4)</td></tr>
+        <tr><td>Gateway</td><td class="mono">10.9.11[.]1</td></tr>
+      </table></div>
+      <p class="muted">Goal: identify the infected client (IP, MAC, host name, user account, full name) and explain what happened.</p>
+    </div>
+  </div>
+
+  <div class="win">
+    <div class="titlebar"><span>victim.txt</span><span class="ctrl">_▢✕</span></div>
+    <div class="mod-body">
+      <div class="tbl"><table>
+        <tr><th>Question</th><th>Answer</th><th>How I found it</th></tr>
+        <tr><td>IP address</td><td class="mono">10.9.11[.]135</td><td>Statistics &gt; Endpoints &gt; IPv4</td></tr>
+        <tr><td>MAC address</td><td class="mono">08:d4:0c:7a:29:1e</td><td>Ethernet II header of its packets</td></tr>
+        <tr><td>Host name</td><td class="mono">DESKTOP-6T17ZFM</td><td>Filter <code>browser</code></td></tr>
+        <tr><td>User account</td><td class="mono">gmcdowell</td><td>Filter <code>kerberos.CNameString</code></td></tr>
+        <tr><td>Full name</td><td class="mono">Gabriel McDowell</td><td>Filter <code>samr.opnum == 36</code></td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <div class="win">
+    <div class="titlebar"><span>investigation.log</span><span class="ctrl">_▢✕</span></div>
+    <div class="mod-body">
+
+      <h2>1. Finding the infected machine</h2>
+      <p>I started with <strong>Statistics &gt; Endpoints &gt; IPv4</strong> to see every address in the capture. Inside the LAN range there were only three: the gateway (.1), the domain controller (.2) and <code>10.9.11.135</code>. The broadcast address (.255) is not a host. That left <code>10.9.11.135</code> as the client, and it had by far the most traffic.</p>
+      <p>To get its hardware address I filtered for its outgoing traffic and read the Ethernet header:</p>
+      <pre><code>ip.src == 10.9.11.135</code></pre>
+      <p>Source MAC: <code>08:d4:0c:7a:29:1e</code>. The first half (<code>08:d4:0c</code>) belongs to Intel, so it is a normal Intel network card.</p>
+
+      <h3>Getting the host name</h3>
+      <p>My first attempts (<code>dhcp</code> and <code>nbns</code>) returned nothing useful, because the machine already had its address before the capture started. What worked was the Windows browser protocol, which computers use to announce themselves on the network:</p>
+      <pre><code>browser</code></pre>
+      <p>The Info column showed <code>Request Announcement DESKTOP-6T17ZFM</code> coming from 10.9.11.135. The only other name announced was <code>WIN-GTWXC9UYSE4</code>, which is the domain controller. The same host name also appears in Kerberos traffic as the service <code>host/desktop-6t17zfm.overhands.org</code>.</p>
+
+      <h3>Getting the user account</h3>
+      <p>In an Active Directory network, users log in through Kerberos, and the client name is sent in plain text:</p>
+      <pre><code>kerberos.CNameString</code></pre>
+      <p>Every request showed <code>gmcdowell</code>. It has no <code>$</code> at the end, so it is a person's account, not a computer account.</p>
+
+      <h3>Getting the full name</h3>
+      <p>The client also asked the domain controller about the user's account through SAMR, the Windows protocol for account lookups. I filtered for QueryUserInfo requests (operation number 36):</p>
+      <pre><code>samr.opnum == 36</code></pre>
+      <p>Inside the QueryUserInfo response (packet 70694), the Full Name field reads <code>Gabriel McDowell</code>. My first attempt picked up a group lookup ("Domain Computers") instead, which taught me to check the operation type before trusting a field.</p>
+
+      <h2 style="margin-top:26px">2. Reconstructing the infection</h2>
+      <p>With the victim identified, I looked at what the machine contacted and in what order, using DNS queries, TLS server names and HTTP requests:</p>
+      <pre><code>dns.flags.response == 0
+tls.handshake.extensions_server_name
+http.request</code></pre>
+
+      <h3>The fake verification page</h3>
+      <p>The capture starts with the user browsing to <code>quadcinema[.]com</code>. Less than a second later the browser loaded content from <code>aatthews[.]cfd</code>, an unrelated domain on a cheap top-level domain. This matches how KongTuke works: a legitimate but compromised site loads a script that shows the fake verification page.</p>
+
+      <h3>The ClickFix command runs</h3>
+      <p>About 35 seconds later, the machine suddenly contacted a burst of new domains: <code>winrun2915[.]com</code>, <code>logincrypt8338[.]com</code>, <code>opscast3707[.]net</code> and then three subdomains of <code>xos-aploq[.]com</code>. That gap fits the time a user needs to open the Run box, paste the command and press Enter. <code>opscast3707[.]net</code> alone sent the host about 7.5 MB.</p>
+
+      <h3>Malware sets up its runtime</h3>
+      <p>Seconds later the host downloaded about 36 MB from <code>nodejs[.]org</code> and later contacted <code>registry.npmjs[.]org</code>. Both are legitimate sites, but a normal user does not download Node.js in the middle of an infection chain. This suggests the malware is written in JavaScript and brings its own Node.js runtime to run it.</p>
+
+      <h3>Command-and-control beaconing</h3>
+      <p>From 20:06:57 onwards, the host sent HTTP requests to <code>know.mom-nower[.]com</code> (<code>86.106.87[.]134</code>) almost exactly every 10 seconds for the rest of the capture:</p>
+      <pre><code>http.host contains "mom-nower"</code></pre>
+      <ul>
+        <li><strong>Regular timing:</strong> a steady 10-second rhythm is typical of malware checking in for instructions, not of a person browsing.</li>
+        <li><strong>Plain HTTP with random-looking URLs:</strong> each path is random, but they all share the same long hex identifier, which marks this infected host to the attacker.</li>
+        <li><strong>Mostly empty replies:</strong> the server usually answered <code>204 No Content</code>, meaning "nothing to do yet".</li>
+        <li><strong>Fake browser identity:</strong> requests claim to come from Firefox 137, but they come from the malware.</li>
+      </ul>
+      <p>At 20:10:03 the host sent a single POST of <strong>4.4 MB</strong> to the C2 server. The other check-ins are only a few hundred bytes, so this upload is very likely stolen data such as saved browser credentials or files.</p>
+
+      <h3>C2 rotation</h3>
+      <p>Around 20:22 the malware started posting to a new set of domains: <code>comonto-rsr[.]com</code>, <code>fif-lost[.]com</code> and <code>bert-hits[.]com</code>, spread over several IP addresses. Each got a small request followed by about 26 KB of data. It also tried <code>globalcert8618[.]net</code>, <code>opsbox8097[.]com</code> and <code>hostjob3862[.]net</code>, which no longer existed (DNS returned "no such domain"). Having many backup domains is a common way for malware to survive when defenders block one.</p>
+    </div>
+  </div>
+
+  <div class="win">
+    <div class="titlebar"><span>timeline.txt</span><span class="ctrl">_▢✕</span></div>
+    <div class="mod-body">
+      <p class="muted">All times UTC on 11 September 2026.</p>
+      <div class="tbl"><table>
+        <tr><th>Time</th><th>Event</th></tr>
+        <tr><td class="time">20:05:55</td><td>User browses to <code>quadcinema[.]com</code></td></tr>
+        <tr><td class="time">20:05:56</td><td>Page loads content from <code>aatthews[.]cfd</code> (likely the fake verification page)</td></tr>
+        <tr><td class="time">20:06:32</td><td>Burst of new domains after the user runs the pasted command (<code>winrun2915[.]com</code>, <code>logincrypt8338[.]com</code>, <code>opscast3707[.]net</code>)</td></tr>
+        <tr><td class="time">20:06:42</td><td>Host contacts <code>www</code>, <code>jaw</code> and <code>soft.xos-aploq[.]com</code></td></tr>
+        <tr><td class="time">20:06:47</td><td>About 36 MB downloaded from <code>nodejs[.]org</code></td></tr>
+        <tr><td class="time">20:06:57</td><td>C2 beaconing to <code>know.mom-nower[.]com</code> begins, every ~10 seconds</td></tr>
+        <tr><td class="time">20:07:08</td><td>Failed lookups for backup domains (<code>globalcert8618[.]net</code> and others)</td></tr>
+        <tr><td class="time">20:10:03</td><td>4.4 MB POST to the C2 server (likely data theft)</td></tr>
+        <tr><td class="time">20:22:17</td><td>Malware rotates to new C2 domains (<code>comonto-rsr[.]com</code>, <code>fif-lost[.]com</code>, <code>bert-hits[.]com</code>)</td></tr>
+        <tr><td class="time">20:27:05</td><td>Capture ends with the host still beaconing</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <div class="win">
+    <div class="titlebar"><span>iocs.txt</span><span class="ctrl">_▢✕</span></div>
+    <div class="mod-body">
+      <p class="muted">Indicators of compromise, defanged so they can't be clicked.</p>
+      <div class="tbl"><table>
+        <tr><th>Indicator</th><th>Type</th><th>Role</th></tr>
+        <tr><td class="mono">aatthews[.]cfd</td><td>Domain</td><td>Likely fake verification page (KongTuke)</td></tr>
+        <tr><td class="mono">winrun2915[.]com<br>logincrypt8338[.]com<br>opscast3707[.]net</td><td>Domains</td><td>Contacted right after the ClickFix command</td></tr>
+        <tr><td class="mono">www / jaw / soft.xos-aploq[.]com</td><td>Domains</td><td>Contacted during the infection</td></tr>
+        <tr><td class="mono">know.mom-nower[.]com<br>86.106.87[.]134</td><td>Domain / IP</td><td>Main C2 server (HTTP beaconing and data upload)</td></tr>
+        <tr><td class="mono">now / start / firt.comonto-rsr[.]com<br>stream / hyko.fif-lost[.]com<br>www / second / gets.bert-hits[.]com</td><td>Domains</td><td>Secondary C2 after rotation</td></tr>
+        <tr><td class="mono">62.3.53[.]87<br>146.70.139[.]165</td><td>IPs</td><td>Secondary C2 servers</td></tr>
+        <tr><td class="mono">globalcert8618[.]net<br>opsbox8097[.]com<br>hostjob3862[.]net</td><td>Domains</td><td>Backup C2, not resolving at the time</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <div class="win">
+    <div class="titlebar"><span>recommendations.txt</span><span class="ctrl">_▢✕</span></div>
+    <div class="mod-body">
+      <ol>
+        <li><strong>Contain:</strong> isolate DESKTOP-6T17ZFM from the network straight away.</li>
+        <li><strong>Credentials:</strong> reset gmcdowell's domain password and sign them out of all sessions. Assume any passwords saved in the browser are stolen, because of the 4.4 MB upload.</li>
+        <li><strong>Block:</strong> add the domains and IPs above to the firewall, proxy and DNS blocklists.</li>
+        <li><strong>Hunt:</strong> search proxy and DNS logs for any other host contacting these indicators, and for other machines downloading Node.js unexpectedly.</li>
+        <li><strong>Recover:</strong> reimage the machine rather than trying to clean it.</li>
+        <li><strong>Prevent:</strong> train staff that no real website asks them to paste commands into Run or PowerShell, and consider restricting the Run dialog through Group Policy for standard users.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="win">
+    <div class="titlebar"><span>lessons.txt</span><span class="ctrl">_▢✕</span></div>
+    <div class="mod-body">
+      <ul>
+        <li>Identity lives in Windows domain protocols. Kerberos, SAMR and the browser protocol answered who, where the obvious ones (DHCP, NBNS) came up empty.</li>
+        <li>Timing is evidence. The 35-second gap before the burst of new domains, and the exact 10-second beacon, told the story more clearly than any single packet.</li>
+        <li>Legitimate sites can be part of an attack. Node.js and npm are safe services, but their appearance in this sequence was a strong clue.</li>
+      </ul>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <a href="../index.html#writeups">&larr; back to writeups</a>
+    <span>medha@soc:~$ exit</span>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var KEY = 'mh-theme', btn = document.getElementById('themeBtn'), root = document.documentElement;
+    function label() { btn.textContent = root.getAttribute('data-theme') === 'light' ? 'Y2K Night' : 'One Light'; }
+    label();
+    btn.addEventListener('click', function () {
+      var next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      if (next === 'light') root.setAttribute('data-theme', 'light'); else root.removeAttribute('data-theme');
+      try { localStorage.setItem(KEY, next); } catch (e) {}
+      label();
+    });
+  })();
+</script>
+</body>
+</html>
