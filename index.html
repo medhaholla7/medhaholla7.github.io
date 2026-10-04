@@ -47,10 +47,15 @@
   <p class="muted">Based in Sydney · Open to cybersecurity roles globally · Full UK work rights (HPI visa, no sponsorship needed)</p>
 
   <h2>About</h2>
-  <p>I'm a Computer Science student focused on defensive security: investigating network traffic, working out what happened in an incident, and writing it up clearly. I'm currently building a home security lab and working through CTFs and security certifications.</p>
+  <p>I'm a Computer Science student focused on defensive security: investigating network traffic, working out what happened in an incident, and writing it up clearly. I run a home security lab with Splunk where I attack my own systems and build detections, and I'm working through CTFs and security certifications.</p>
 
   <h2>Writeups</h2>
   <div class="card">
+    <h3><a href="writeups/ssh-brute-force-splunk.html">Building a Home SOC Lab and Detecting SSH Brute Force with Splunk</a></h3>
+    <p class="meta">Detection engineering · Splunk</p>
+    <p>Built a Linux server with Splunk in VirtualBox, fed it the server's login logs, attacked it with repeated wrong passwords, and wrote a detection rule and scheduled alert that flagged the attacker after 5 failed logins.</p>
+  </div>
+  <div class="card" style="margin-top:14px">
     <h3><a href="writeups/clickfix-kongtuke.html">Investigating a ClickFix Malware Infection with Wireshark</a></h3>
     <p class="meta">Incident report · Network forensics</p>
     <p>Analysed a packet capture from an infected company laptop. Identified the victim machine and user from Windows login traffic, rebuilt the attack from a hacked website to malware install, and found the malware reporting to the attacker every 10 seconds, including a 4.4 MB data upload.</p>
@@ -58,8 +63,8 @@
 
   <h2>Skills</h2>
   <ul>
-    <li><strong>Security:</strong> packet analysis, incident investigation, reading Windows / Active Directory traffic, writing incident reports</li>
-    <li><strong>Tools:</strong> Wireshark, Nmap, Gobuster, VirtualBox</li>
+    <li><strong>Security:</strong> log analysis and detection rules (Splunk SPL), packet analysis, incident investigation, reading Windows / Active Directory traffic, writing incident reports</li>
+    <li><strong>Tools:</strong> Splunk, Wireshark, Nmap, Gobuster, VirtualBox</li>
     <li><strong>Programming:</strong> Python, Bash, SQL, C, Git, Linux</li>
   </ul>
 
