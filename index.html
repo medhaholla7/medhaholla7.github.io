@@ -51,6 +51,11 @@
 
   <h2>Writeups</h2>
   <div class="card">
+    <h3><a href="writeups/android-amaze-security-assessment.html">Android App Security Assessment: Amaze File Manager</a></h3>
+    <p class="meta">Mobile security · OWASP Mobile Top 10 · Source review</p>
+    <p>Reviewed the source of a popular open-source Android file manager and found four real issues, including a cryptographic flaw (the same encryption IV reused for every file) that I proved with a working demo on my own test data. Mapped each to the OWASP Mobile Top 10 with fixes, and verified two older CVEs were already patched.</p>
+  </div>
+  <div class="card" style="margin-top:14px">
     <h3><a href="writeups/securepipe-devsecops-pipeline.html">SecurePipe: A CI/CD Security Pipeline That Blocks Vulnerable Code</a></h3>
     <p class="meta">DevSecOps · Application security · GitHub Actions</p>
     <p>Built a small API with 9 security flaws planted on purpose, then a GitHub Actions pipeline (Gitleaks, Semgrep, Trivy, Checkov, plus an access-control test) that fails the build when any of them are present. It catches all 11, including personal data leaking into logs (mapped to GDPR), with 0 false positives on fixed code.</p>
@@ -84,7 +89,7 @@
   <h2>Skills</h2>
   <ul>
     <li><strong>Security:</strong> log analysis and detection rules (Splunk SPL), packet analysis, incident investigation, reading Windows / Active Directory traffic, writing incident reports</li>
-    <li><strong>Tools:</strong> Splunk, Sysmon, Wireshark, Nmap, Gobuster, VirtualBox, Semgrep, Gitleaks, Trivy, Checkov, GitHub Actions, Docker</li>
+    <li><strong>Tools:</strong> Splunk, Sysmon, Wireshark, Nmap, Gobuster, VirtualBox, Semgrep, Gitleaks, Trivy, Checkov, GitHub Actions, Docker, androguard, OWASP Mobile Top 10</li>
     <li><strong>Programming:</strong> Python, Bash, SQL, C, Git, Linux</li>
   </ul>
 
