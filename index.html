@@ -51,6 +51,11 @@
 
   <h2>Writeups</h2>
   <div class="card">
+    <h3><a href="writeups/securepipe-devsecops-pipeline.html">SecurePipe: A CI/CD Security Pipeline That Blocks Vulnerable Code</a></h3>
+    <p class="meta">DevSecOps · Application security · GitHub Actions</p>
+    <p>Built a small API with 9 security flaws planted on purpose, then a GitHub Actions pipeline (Gitleaks, Semgrep, Trivy, Checkov) that fails the build when any of them are present. Wrote 5 custom Semgrep rules that catch 5 of the flaws with 0 false positives on fixed code.</p>
+  </div>
+  <div class="card" style="margin-top:14px">
     <h3><a href="writeups/windows-backdoor-admin-sysmon-splunk.html">Home SOC Lab Part 2: Detecting a Backdoor Admin Account on Windows</a></h3>
     <p class="meta">Detection engineering · Sysmon · Splunk</p>
     <p>Added a Windows 11 machine to my lab with Sysmon and the Splunk Universal Forwarder, simulated an attacker creating a hidden admin account, and caught it with Windows events 4720 and 4732 plus Sysmon process logs, then saved it as a scheduled alert (MITRE ATT&amp;CK T1136.001).</p>
@@ -79,7 +84,7 @@
   <h2>Skills</h2>
   <ul>
     <li><strong>Security:</strong> log analysis and detection rules (Splunk SPL), packet analysis, incident investigation, reading Windows / Active Directory traffic, writing incident reports</li>
-    <li><strong>Tools:</strong> Splunk, Sysmon, Wireshark, Nmap, Gobuster, VirtualBox</li>
+    <li><strong>Tools:</strong> Splunk, Sysmon, Wireshark, Nmap, Gobuster, VirtualBox, Semgrep, Gitleaks, Trivy, Checkov, GitHub Actions, Docker</li>
     <li><strong>Programming:</strong> Python, Bash, SQL, C, Git, Linux</li>
   </ul>
 
