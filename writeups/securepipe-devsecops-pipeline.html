@@ -51,7 +51,7 @@
   <p class="meta">Medha Holla · DevSecOps / application security · Tools: Python, FastAPI, Docker, GitHub Actions, Semgrep, Gitleaks, Trivy, Checkov</p>
 
   <div class="tldr">
-    <p><strong>Summary.</strong> I built a small notes API with 9 security flaws planted on purpose, then built a CI/CD pipeline that scans every push and blocks the merge if any of those flaws are present. The pipeline catches <strong>all 9</strong>: 8 through scanners with custom rules, and the 9th (an access-control flaw no scanner can see) through a test that acts like an attacker. The custom rules raise 0 false positives on a fixed version of the same code.</p>
+    <p><strong>Summary.</strong> I built a small notes API with 9 security flaws planted on purpose, then built a CI/CD pipeline that scans every push and blocks the merge if any of those flaws are present. The pipeline catches <strong>all 11</strong>: 8 through scanners with custom rules, and 3 through tests and a runtime log scan (the flaws that no static scanner can see, like an access-control gap or personal data leaking into logs). The custom rules raise 0 false positives on a fixed version of the same code.</p>
     <p><strong>Why:</strong> it shows the full loop a security engineer runs: find the weakness, prove it is real, then automate a control so it cannot come back.</p>
   </div>
   <p>Code and live pipeline: <a href="https://github.com/medhaholla7/securepipe">github.com/medhaholla7/securepipe</a></p>
@@ -87,7 +87,8 @@
     <tr><td>Secrets</td><td>Gitleaks + 2 custom rules</td><td>Keys and passwords committed anywhere in git history</td></tr>
     <tr><td>Code (SAST)</td><td>Semgrep</td><td>Insecure code patterns, using my custom rules plus the standard Python ruleset</td></tr>
     <tr><td>False-positive check</td><td>Semgrep</td><td>Runs my rules on the fixed code, which must produce 0 findings</td></tr>
-    <tr><td>Access control</td><td>pytest</td><td>Logs in as one user and tries to read another user's note</td></tr>
+    <tr><td>Access control and privacy</td><td>pytest</td><td>Logs in as one user and tries to read another user's note, and to pull everyone's email and phone</td></tr>
+    <tr><td>Privacy / GDPR</td><td>pii_scan.py</td><td>Runs the app, then scans the log it produces for personal data and credentials</td></tr>
     <tr><td>Dependencies and container</td><td>Trivy</td><td>Known vulnerable packages and container misconfigurations (HIGH and CRITICAL only)</td></tr>
     <tr><td>Infrastructure as code</td><td>Checkov</td><td>Dockerfile and Compose misconfigurations</td></tr>
   </table></div>
@@ -105,6 +106,7 @@
     <li><strong>All 9 planted flaws caught:</strong> 8 by scanners, and the IDOR by the access-control test.</li>
     <li><strong>0 false positives</strong> from my custom Semgrep rules on the fixed code.</li>
     <li>Trivy found <strong>5 known CVEs</strong> in the old PyJWT version (1 critical, 4 high), including authentication bypass with forged tokens.</li>
+    <li><strong>Privacy:</strong> a custom rule and a runtime log scan caught passwords, emails and phone numbers written to logs, each mapped to the GDPR article it breaks (data minimisation and security of processing). The scan masks the value it finds, so it never re-leaks the data.</li>
   </ul>
 
   <h2>6. Problems I hit and how I solved them</h2>
@@ -124,7 +126,7 @@
   </ul>
 
   <h2>8. Next steps</h2>
-  <p>Add a privacy check that flags personal data (emails, phone numbers) written to logs, mapped to the relevant GDPR articles.</p>
+  <p>Add container image signing and a software bill of materials (SBOM) so the supply chain itself is verifiable, not just the code.</p>
 </main>
 </main>
 

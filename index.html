@@ -53,7 +53,7 @@
   <div class="card">
     <h3><a href="writeups/securepipe-devsecops-pipeline.html">SecurePipe: A CI/CD Security Pipeline That Blocks Vulnerable Code</a></h3>
     <p class="meta">DevSecOps · Application security · GitHub Actions</p>
-    <p>Built a small API with 9 security flaws planted on purpose, then a GitHub Actions pipeline (Gitleaks, Semgrep, Trivy, Checkov, plus an access-control test) that fails the build when any of them are present. It catches all 9, using custom Semgrep and Gitleaks rules, with 0 false positives on fixed code.</p>
+    <p>Built a small API with 9 security flaws planted on purpose, then a GitHub Actions pipeline (Gitleaks, Semgrep, Trivy, Checkov, plus an access-control test) that fails the build when any of them are present. It catches all 11, including personal data leaking into logs (mapped to GDPR), with 0 false positives on fixed code.</p>
   </div>
   <div class="card" style="margin-top:14px">
     <h3><a href="writeups/windows-backdoor-admin-sysmon-splunk.html">Home SOC Lab Part 2: Detecting a Backdoor Admin Account on Windows</a></h3>
