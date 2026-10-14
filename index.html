@@ -51,6 +51,11 @@
 
   <h2>Writeups</h2>
   <div class="card">
+    <h3><a href="writeups/windows-backdoor-admin-sysmon-splunk.html">Home SOC Lab Part 2: Detecting a Backdoor Admin Account on Windows</a></h3>
+    <p class="meta">Detection engineering · Sysmon · Splunk</p>
+    <p>Added a Windows 11 machine to my lab with Sysmon and the Splunk Universal Forwarder, simulated an attacker creating a hidden admin account, and caught it with Windows events 4720 and 4732 plus Sysmon process logs, then saved it as a scheduled alert (MITRE ATT&amp;CK T1136.001).</p>
+  </div>
+  <div class="card" style="margin-top:14px">
     <h3><a href="writeups/ssh-brute-force-splunk.html">Building a Home SOC Lab and Detecting SSH Brute Force with Splunk</a></h3>
     <p class="meta">Detection engineering · Splunk</p>
     <p>Built a Linux server with Splunk in VirtualBox, fed it the server's login logs, attacked it with repeated wrong passwords, and wrote a detection rule and scheduled alert that flagged the attacker after 5 failed logins.</p>
@@ -74,7 +79,7 @@
   <h2>Skills</h2>
   <ul>
     <li><strong>Security:</strong> log analysis and detection rules (Splunk SPL), packet analysis, incident investigation, reading Windows / Active Directory traffic, writing incident reports</li>
-    <li><strong>Tools:</strong> Splunk, Wireshark, Nmap, Gobuster, VirtualBox</li>
+    <li><strong>Tools:</strong> Splunk, Sysmon, Wireshark, Nmap, Gobuster, VirtualBox</li>
     <li><strong>Programming:</strong> Python, Bash, SQL, C, Git, Linux</li>
   </ul>
 
