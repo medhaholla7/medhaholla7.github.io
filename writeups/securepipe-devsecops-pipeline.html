@@ -51,23 +51,24 @@
   <p class="meta">Medha Holla · DevSecOps / application security · Tools: Python, FastAPI, Docker, GitHub Actions, Semgrep, Gitleaks, Trivy, Checkov</p>
 
   <div class="tldr">
-    <p><strong>Summary.</strong> I built a small notes API with 9 security flaws planted on purpose, then built a CI/CD pipeline that scans every push and blocks the merge if any of those flaws are present. I wrote 5 custom Semgrep rules that catch 5 of the 9 flaws with 0 false positives on a fixed version of the same code.</p>
+    <p><strong>Summary.</strong> I built a small notes API with 9 security flaws planted on purpose, then built a CI/CD pipeline that scans every push and blocks the merge if any of those flaws are present. The pipeline catches <strong>all 9</strong>: 8 through scanners with custom rules, and the 9th (an access-control flaw no scanner can see) through a test that acts like an attacker. The custom rules raise 0 false positives on a fixed version of the same code.</p>
     <p><strong>Why:</strong> it shows the full loop a security engineer runs: find the weakness, prove it is real, then automate a control so it cannot come back.</p>
   </div>
+  <p>Code and live pipeline: <a href="https://github.com/medhaholla7/securepipe">github.com/medhaholla7/securepipe</a></p>
   <p class="meta">The app is intentionally vulnerable. It runs only on my own machine and is never deployed to the internet.</p>
 
   <h2>1. The app and its planted flaws</h2>
   <p>A FastAPI "notes" API with SQLite and JWT login. Users log in and read their own notes. I seeded these flaws, each tagged in the code and mapped to a CWE:</p>
   <div class="scroll"><table>
     <tr><th>#</th><th>Flaw</th><th>CWE</th><th>Caught by</th></tr>
-    <tr><td>1</td><td>Hardcoded JWT signing secret</td><td>CWE-798</td><td>Semgrep, Gitleaks</td></tr>
+    <tr><td>1</td><td>Hardcoded JWT signing secret</td><td>CWE-798</td><td>Semgrep, Gitleaks (custom rule)</td></tr>
     <tr><td>2</td><td>CORS allows any origin with credentials</td><td>CWE-942</td><td>Semgrep</td></tr>
     <tr><td>3</td><td>Passwords stored in plain text</td><td>CWE-256</td><td>Semgrep</td></tr>
     <tr><td>4</td><td>SQL injection in the login query</td><td>CWE-89</td><td>Semgrep</td></tr>
-    <tr><td>5</td><td>Any user can read any note by changing the ID (IDOR)</td><td>CWE-639</td><td>Manual test</td></tr>
+    <tr><td>5</td><td>Any user can read any note by changing the ID (IDOR)</td><td>CWE-639</td><td>Access-control test</td></tr>
     <tr><td>6</td><td>Debug endpoint returns all config, including secrets</td><td>CWE-215</td><td>Semgrep</td></tr>
-    <tr><td>7</td><td>Outdated dependency (PyJWT 1.7.1)</td><td>CWE-1395</td><td>Trivy</td></tr>
-    <tr><td>8</td><td>Secrets committed in a <code>.env</code> file</td><td>CWE-798</td><td>Gitleaks</td></tr>
+    <tr><td>7</td><td>Outdated dependency (PyJWT 1.7.1)</td><td>CWE-1395</td><td>Trivy (5 CVEs)</td></tr>
+    <tr><td>8</td><td>Secrets committed in a <code>.env</code> file</td><td>CWE-798</td><td>Gitleaks (custom rule)</td></tr>
     <tr><td>9</td><td>Container runs as root</td><td>CWE-250</td><td>Trivy, Checkov</td></tr>
   </table></div>
 
@@ -80,11 +81,13 @@
   </ul>
 
   <h2>3. The pipeline</h2>
-  <p>A GitHub Actions workflow runs four scanners on every push and pull request. Any finding fails the build, so the PR cannot be merged.</p>
+  <p>A GitHub Actions workflow runs 6 jobs on every push and pull request. Any finding fails the build, so the PR cannot be merged. A small script turns each scanner's output into inline annotations, so the developer sees the problem on the exact line of their pull request.</p>
   <div class="scroll"><table>
     <tr><th>Job</th><th>Tool</th><th>What it checks</th></tr>
-    <tr><td>Secrets</td><td>Gitleaks</td><td>Keys and passwords committed anywhere in git history</td></tr>
+    <tr><td>Secrets</td><td>Gitleaks + 2 custom rules</td><td>Keys and passwords committed anywhere in git history</td></tr>
     <tr><td>Code (SAST)</td><td>Semgrep</td><td>Insecure code patterns, using my custom rules plus the standard Python ruleset</td></tr>
+    <tr><td>False-positive check</td><td>Semgrep</td><td>Runs my rules on the fixed code, which must produce 0 findings</td></tr>
+    <tr><td>Access control</td><td>pytest</td><td>Logs in as one user and tries to read another user's note</td></tr>
     <tr><td>Dependencies and container</td><td>Trivy</td><td>Known vulnerable packages and container misconfigurations (HIGH and CRITICAL only)</td></tr>
     <tr><td>Infrastructure as code</td><td>Checkov</td><td>Dockerfile and Compose misconfigurations</td></tr>
   </table></div>
@@ -97,17 +100,20 @@
   pattern-regex: 'f"\s*(SELECT|INSERT|UPDATE|DELETE)[^"]*\{'</code></pre>
   <p>To test for false positives, I wrote a fixed copy of the app (parameterised queries, secret from the environment, restricted CORS, no debug endpoint) and ran the same rules against it.</p>
 
-  <h2>5. Results</h2>
+  <h2>5. Results (from real pipeline runs)</h2>
   <ul>
-    <li><strong>Vulnerable app:</strong> 7 findings covering 5 of the 9 planted flaws.</li>
-    <li><strong>Fixed app:</strong> 0 findings, so 0 false positives.</li>
-    <li>The remaining flaws are covered by Gitleaks (committed secrets), Trivy (outdated dependency, root container) and Checkov.</li>
+    <li><strong>All 9 planted flaws caught:</strong> 8 by scanners, and the IDOR by the access-control test.</li>
+    <li><strong>0 false positives</strong> from my custom Semgrep rules on the fixed code.</li>
+    <li>Trivy found <strong>5 known CVEs</strong> in the old PyJWT version (1 critical, 4 high), including authentication bypass with forged tokens.</li>
   </ul>
 
   <h2>6. Problems I hit and how I solved them</h2>
   <ul>
-    <li><strong>Rules that didn't fire.</strong> My first SQL injection and CORS rules used Semgrep's code-structure patterns, which were too strict and matched nothing. I switched those two to regex patterns and tested again until all 5 fired.</li>
-    <li><strong>Semgrep hanging.</strong> Semgrep tried to contact its server for metrics and version checks and timed out on my network. Running it with <code>--metrics=off</code> fixed it.</li>
+    <li><strong>Gitleaks missed every planted secret.</strong> Its default rules only recognise real provider key formats (AWS, GitHub and so on), not a hand-written signing key or a password in a <code>.env</code> file. I wrote 2 custom rules, which caught all 3.</li>
+    <li><strong>Gitleaks only checked new commits.</strong> The GitHub Action scanned just the commits in each push, so a secret added earlier was never checked. I switched to scanning the full git history on every run, because a secret deleted later is still leaked.</li>
+    <li><strong>A rule labelled the wrong flaw.</strong> My "hardcoded secret" rule fired on the SQL line, because <code>password='{body.password}'</code> looks like a password. It is a placeholder, not a secret, so I tightened the pattern.</li>
+    <li><strong>Rules that didn't fire.</strong> My first SQL injection and CORS rules used Semgrep's code-structure patterns, which were too strict. I switched them to regex patterns and tested until all 5 fired.</li>
+    <li><strong>The Trivy job broke at setup.</strong> The version of the Trivy GitHub Action I pinned no longer existed. I replaced it with a pinned Trivy release.</li>
   </ul>
 
   <h2>7. What I learned</h2>
@@ -118,7 +124,7 @@
   </ul>
 
   <h2>8. Next steps</h2>
-  <p>Add an automated test that catches the IDOR, and a privacy check that flags personal data (emails, phone numbers) written to logs, mapped to the relevant GDPR articles.</p>
+  <p>Add a privacy check that flags personal data (emails, phone numbers) written to logs, mapped to the relevant GDPR articles.</p>
 </main>
 </main>
 
