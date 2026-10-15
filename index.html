@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Medha Holla, cybersecurity graduate (UNSW, Dec 2026). Security writeups, skills and certifications. Full UK work rights.">
+<meta name="description" content="Medha Holla, cybersecurity student at UNSW Sydney (finishing Dec 2026). Security writeups, skills and certifications.">
 <title>Medha Holla | Cybersecurity</title>
 <script>
   (function () { try { if (localStorage.getItem('mh-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark'); } catch (e) {} })();
@@ -51,6 +51,11 @@
 
   <h2>Writeups</h2>
   <div class="card">
+    <h3><a href="writeups/credential-stuffing-splunk.html">Detecting Credential Stuffing and Account Takeover with Splunk</a></h3>
+    <p class="meta">Detection engineering · Splunk · Fraud and account takeover</p>
+    <p>Built a login log for a mock retail loyalty site with a night-time bot attack replaying 1,260 leaked passwords, then wrote three Splunk detections that found all 30 attacking IPs and all 4 hijacked accounts with no normal customers flagged, and traced what the attacker did next (email change, points redeemed). Saved as hourly alerts (MITRE ATT&amp;CK T1110.004).</p>
+  </div>
+  <div class="card" style="margin-top:14px">
     <h3><a href="writeups/android-amaze-security-assessment.html">Android App Security Assessment: Amaze File Manager</a></h3>
     <p class="meta">Mobile security · OWASP Mobile Top 10 · Source review</p>
     <p>Reviewed the source of a popular open-source Android file manager and found four real issues, including a cryptographic flaw (the same encryption IV reused for every file) that I proved with a working demo on my own test data. Mapped each to the OWASP Mobile Top 10 with fixes, and verified two older CVEs were already patched.</p>
