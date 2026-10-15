@@ -51,6 +51,11 @@
 
   <h2>Writeups</h2>
   <div class="card">
+    <h3><a href="writeups/secure-office-network-cisco.html">Building and Securing a Small-Office Network in Cisco Packet Tracer</a></h3>
+    <p class="meta">Network security · Cisco IOS · VLANs, ACLs, NAT</p>
+    <p>Designed a network for a mock accounting firm with separate staff and guest VLANs, DHCP and NAT, then locked it down: an ACL that keeps guests off staff devices, SSH-only router admin with a login lockout, and switch port security. Attacked it to test every control (guests blocked, password guessing locked out, a rogue laptop's port shut down), and testing exposed an unprotected switch, which I fixed.</p>
+  </div>
+  <div class="card" style="margin-top:14px">
     <h3><a href="writeups/m365-security-review.html">Microsoft 365 Security Review for a Small Business</a></h3>
     <p class="meta">Cloud security · GRC · Cyber Essentials</p>
     <p>Reviewed a Microsoft 365 Business Premium tenant for a mock 5-person accounting firm against CIS and CISA baselines, mapped the gaps to the five Cyber Essentials controls in a customer-style report, then fixed them with Conditional Access, Exchange Online PowerShell, Defender and Intune. Failed checks fell from 154 to 115 on rescan.</p>
@@ -99,6 +104,7 @@
   <h2>Skills</h2>
   <ul>
     <li><strong>Security:</strong> log analysis and detection rules (Splunk SPL), packet analysis, incident investigation, reading Windows / Active Directory traffic, writing incident reports</li>
+    <li><strong>Networking:</strong> Cisco IOS, VLANs and trunking, DHCP, NAT, ACLs, SSH hardening, switch port security, Packet Tracer</li>
     <li><strong>Tools:</strong> Splunk, Sysmon, Wireshark, Nmap, Gobuster, VirtualBox, Semgrep, Gitleaks, Trivy, Checkov, GitHub Actions, Docker, androguard, OWASP Mobile Top 10</li>
     <li><strong>Programming:</strong> Python, Bash, SQL, C, Git, Linux</li>
   </ul>
