@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Designing, securing and testing a small-office network in Cisco Packet Tracer: staff and guest VLANs, DHCP, NAT, an ACL that keeps guests away from staff devices, SSH-only router access and switch port security.">
+<title>Building and Securing a Small-Office Network in Cisco Packet Tracer | Medha Holla</title>
+<script>
+  (function () { try { if (localStorage.getItem('mh-theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark'); } catch (e) {} })();
+</script>
+<style>
+  :root { color-scheme: light; --bg: #ffffff; --fg: #1f2328; --muted: #59636e; --line: #d1d9e0; --soft: #f6f8fa; --link: #0969da; --accent: #cf222e; --staff: #1a7f37; --guest: #9a6700; }
+  :root[data-theme="dark"] { color-scheme: dark; --bg: #0d1117; --fg: #e6edf3; --muted: #9198a1; --line: #30363d; --soft: #161b22; --link: #4493f8; --accent: #ff7b72; --staff: #3fb950; --guest: #d29922; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.7 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  main, .top { max-width: 720px; margin: 0 auto; padding: 0 16px; }
+  .top { display: flex; justify-content: space-between; align-items: center; padding-top: 16px; padding-bottom: 16px; font-size: 15px; }
+  a { color: var(--link); }
+  button { font: inherit; font-size: 14px; background: none; border: 1px solid var(--line); color: var(--muted); border-radius: 6px; padding: 4px 10px; cursor: pointer; }
+  h1 { font-size: 32px; line-height: 1.25; margin: 24px 0 8px; }
+  h2 { font-size: 22px; margin: 40px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--line); }
+  h3 { font-size: 18px; margin: 24px 0 6px; }
+  p, ul, ol { margin: 0 0 14px; }
+  li { margin-bottom: 6px; }
+  .meta { color: var(--muted); font-size: 15px; margin-bottom: 24px; }
+  .tldr { background: var(--soft); border-left: 4px solid var(--accent); padding: 14px 18px; margin: 0 0 8px; }
+  .tldr p:last-child { margin: 0; }
+  code { font: 14px/1.5 ui-monospace, Consolas, Menlo, monospace; background: var(--soft); border: 1px solid var(--line); border-radius: 4px; padding: 1px 5px; }
+  pre { background: var(--soft); border: 1px solid var(--line); border-radius: 6px; padding: 12px 14px; overflow-x: auto; margin: 0 0 16px; }
+  pre code { border: 0; padding: 0; background: none; font-size: 13.5px; }
+  .scroll { overflow-x: auto; margin: 0 0 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 15px; }
+  th, td { text-align: left; padding: 8px 10px; border: 1px solid var(--line); vertical-align: top; }
+  th { background: var(--soft); }
+  figure { margin: 0 0 18px; }
+  figcaption { color: var(--muted); font-size: 14px; margin-top: 6px; }
+  .diagram { width: 100%; height: auto; display: block; border: 1px solid var(--line); border-radius: 6px; background: var(--soft); }
+  .diagram text { fill: var(--fg); font: 13px -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .diagram .small { fill: var(--muted); font-size: 11.5px; }
+  .diagram .box { fill: var(--bg); stroke: var(--fg); stroke-width: 1.2; }
+  .diagram .wire { stroke: var(--muted); stroke-width: 1.6; }
+  .diagram .staff { fill: none; stroke: var(--staff); stroke-width: 1.6; stroke-dasharray: 5 4; }
+  .diagram .guest { fill: none; stroke: var(--guest); stroke-width: 1.6; stroke-dasharray: 5 4; }
+  .diagram .lstaff { fill: var(--staff); font-weight: 600; }
+  .diagram .lguest { fill: var(--guest); font-weight: 600; }
+  .pass { color: var(--staff); font-weight: 600; }
+  footer { max-width: 720px; margin: 48px auto 0; padding: 20px 16px 48px; border-top: 1px solid var(--line); color: var(--muted); font-size: 15px; }
+</style>
+</head>
+<body>
+
+<div class="top">
+  <a href="../index.html#writeups">&larr; All writeups</a>
+  <button id="themeBtn" aria-label="Toggle dark mode">Dark</button>
+</div>
+
+<main>
+  <h1>Building and Securing a Small-Office Network in Cisco Packet Tracer</h1>
+  <p class="meta">Medha Holla · Network security · Tools: Cisco Packet Tracer 9.0, Cisco IOS (ISR 4331 router, Catalyst 2960 switch)</p>
+
+  <div class="tldr">
+    <p><strong>Summary.</strong> Small offices often run staff computers, a file server and the guest Wi-Fi on one flat network, so a visitor's laptop can reach the server holding client files. I designed the network for a made-up 5-person accounting firm, "Kestrel Accounting", built it in Cisco Packet Tracer, and locked it down.</p>
+    <p>Staff and guests get separate networks (VLANs) and automatic addresses, both reach the internet through NAT, and the router blocks guests from every staff device. Router admin is SSH only, from the staff network only, with a lockout after 3 wrong passwords. Every staff switch port accepts only its own device.</p>
+    <p>I then <strong>attacked my own network to test each control</strong>, and all of them held. Testing also turned up a gap I had missed, a switch with no admin password, which I fixed.</p>
+  </div>
+
+  <h2>1. The design</h2>
+  <figure>
+    <svg class="diagram" viewBox="0 0 680 360" role="img" aria-label="Network diagram: internet server, ISP router, office router KA-R1, switch KA-SW1, staff VLAN 10 with two PCs and a file server, guest VLAN 20 with a laptop">
+      <rect class="box" x="20" y="28" width="150" height="46" rx="6"/>
+      <text x="95" y="48" text-anchor="middle">Web server</text>
+      <text class="small" x="95" y="65" text-anchor="middle">198.51.100.10 ("internet")</text>
+      <line class="wire" x1="170" y1="51" x2="240" y2="51"/>
+      <rect class="box" x="240" y="28" width="120" height="46" rx="6"/>
+      <text x="300" y="48" text-anchor="middle">ISP router</text>
+      <text class="small" x="300" y="65" text-anchor="middle">203.0.113.1</text>
+      <line class="wire" x1="360" y1="51" x2="430" y2="51"/>
+      <text class="small" x="395" y="43" text-anchor="middle">NAT</text>
+      <rect class="box" x="430" y="28" width="150" height="46" rx="6"/>
+      <text x="505" y="48" text-anchor="middle">KA-R1 (ISR 4331)</text>
+      <text class="small" x="505" y="65" text-anchor="middle">outside 203.0.113.2</text>
+      <line class="wire" x1="505" y1="74" x2="505" y2="130"/>
+      <text class="small" x="512" y="105">802.1Q trunk (VLAN 10, 20)</text>
+      <rect class="box" x="430" y="130" width="150" height="46" rx="6"/>
+      <text x="505" y="150" text-anchor="middle">KA-SW1 (2960)</text>
+      <text class="small" x="505" y="167" text-anchor="middle">port security on</text>
+      <line class="wire" x1="470" y1="176" x2="110" y2="250"/>
+      <line class="wire" x1="480" y1="176" x2="250" y2="250"/>
+      <line class="wire" x1="495" y1="176" x2="390" y2="250"/>
+      <line class="wire" x1="540" y1="176" x2="580" y2="250"/>
+      <rect class="staff" x="30" y="232" width="440" height="108" rx="8"/>
+      <text class="lstaff" x="42" y="330">VLAN 10 STAFF · 192.168.10.0/24</text>
+      <rect class="box" x="50" y="250" width="120" height="46" rx="6"/>
+      <text x="110" y="270" text-anchor="middle">PC0</text>
+      <text class="small" x="110" y="287" text-anchor="middle">.21 (DHCP) · Fa0/1</text>
+      <rect class="box" x="190" y="250" width="120" height="46" rx="6"/>
+      <text x="250" y="270" text-anchor="middle">PC1</text>
+      <text class="small" x="250" y="287" text-anchor="middle">.22 (DHCP) · Fa0/3</text>
+      <rect class="box" x="330" y="250" width="120" height="46" rx="6"/>
+      <text x="390" y="270" text-anchor="middle">File server</text>
+      <text class="small" x="390" y="287" text-anchor="middle">.5 (static) · Fa0/5</text>
+      <rect class="guest" x="500" y="232" width="160" height="108" rx="8"/>
+      <text class="lguest" x="512" y="330">VLAN 20 GUEST</text>
+      <rect class="box" x="520" y="250" width="120" height="46" rx="6"/>
+      <text x="580" y="270" text-anchor="middle">Guest laptop</text>
+      <text class="small" x="580" y="287" text-anchor="middle">192.168.20.11 · Fa0/13</text>
+    </svg>
+    <figcaption>One switch, two VLANs. The router routes between them on a single trunk link ("router on a stick") and decides what each one may reach.</figcaption>
+  </figure>
+
+  <div class="scroll"><table>
+    <tr><th>Network</th><th>VLAN</th><th>Addresses</th><th>Who is on it</th></tr>
+    <tr><td>Staff</td><td>10</td><td>192.168.10.0/24, gateway .1, DHCP from .21 (.2 to .20 kept for servers)</td><td>2 staff PCs, file server (static .5)</td></tr>
+    <tr><td>Guest</td><td>20</td><td>192.168.20.0/24, gateway .1, DHCP from .11</td><td>Visitors' devices</td></tr>
+    <tr><td>Parking</td><td>99</td><td>none</td><td>Every unused switch port, shut down</td></tr>
+    <tr><td>Outside</td><td>none</td><td>203.0.113.0/30 to the ISP</td><td>Router's internet link</td></tr>
+  </table></div>
+
+  <h2>2. Building it</h2>
+  <h3>Switch: VLANs, trunk and unused ports</h3>
+<pre><code>vlan 10
+ name STAFF
+vlan 20
+ name GUEST
+vlan 99
+ name PARKING
+!
+interface range fa0/1, fa0/3, fa0/5
+ switchport mode access
+ switchport access vlan 10
+interface fa0/13
+ switchport mode access
+ switchport access vlan 20
+!
+interface gig0/1
+ switchport mode trunk
+ switchport trunk allowed vlan 10,20
+ switchport nonegotiate
+!
+interface range fa0/2, fa0/4, fa0/6 - 12, fa0/14 - 24, gig0/2
+ switchport access vlan 99
+ shutdown</code></pre>
+  <p>The trunk only carries VLANs 10 and 20, and <code>nonegotiate</code> stops a device on the other end from talking the port into becoming a trunk (a VLAN-hopping trick). Unused ports are shut down and parked in a VLAN that goes nowhere, so plugging into a spare wall socket gets you nothing.</p>
+
+  <h3>Router: one sub-interface per VLAN, and DHCP</h3>
+<pre><code>interface gig0/0/0.10
+ encapsulation dot1Q 10
+ ip address 192.168.10.1 255.255.255.0
+interface gig0/0/0.20
+ encapsulation dot1Q 20
+ ip address 192.168.20.1 255.255.255.0
+!
+ip dhcp excluded-address 192.168.10.1 192.168.10.20
+ip dhcp excluded-address 192.168.20.1 192.168.20.10
+ip dhcp pool STAFF
+ network 192.168.10.0 255.255.255.0
+ default-router 192.168.10.1
+ dns-server 1.1.1.1
+ip dhcp pool GUEST
+ network 192.168.20.0 255.255.255.0
+ default-router 192.168.20.1
+ dns-server 1.1.1.1</code></pre>
+  <p>Both PCs and the guest laptop were set to DHCP and got addresses in the right network straight away (PC0 192.168.10.21, PC1 192.168.10.22, guest laptop 192.168.20.11), which confirmed the VLANs and trunk were working before I added any security.</p>
+
+  <h3>Router: internet access with NAT</h3>
+<pre><code>interface gig0/0/1
+ description Link to ISP
+ ip address 203.0.113.2 255.255.255.252
+ ip nat outside
+interface gig0/0/0.10
+ ip nat inside
+interface gig0/0/0.20
+ ip nat inside
+!
+access-list 1 permit 192.168.10.0 0.0.0.255
+access-list 1 permit 192.168.20.0 0.0.0.255
+ip nat inside source list 1 interface gig0/0/1 overload
+ip route 0.0.0.0 0.0.0.0 203.0.113.1</code></pre>
+  <p>Private 192.168.x.x addresses can't travel across the internet, so the router swaps them for its one public address on the way out (PAT, or NAT "overload") and swaps them back on the way in. To stand in for the internet I added an ISP router and a public web server (198.51.100.10) behind it. The ISP router has <strong>no route</strong> to the office's private networks, just like a real ISP, so the office can only reach the server if NAT is working.</p>
+
+  <h2>3. Locking it down</h2>
+  <h3>Keep guests away from staff (extended ACL)</h3>
+<pre><code>ip access-list extended GUEST-IN
+ remark Guests cannot reach staff network or router management
+ deny ip 192.168.20.0 0.0.0.255 192.168.10.0 0.0.0.255
+ deny tcp 192.168.20.0 0.0.0.255 any eq 22
+ deny tcp 192.168.20.0 0.0.0.255 any eq 23
+ permit udp any any eq bootps
+ permit ip 192.168.20.0 0.0.0.255 any
+!
+interface gig0/0/0.20
+ ip access-group GUEST-IN in</code></pre>
+  <p>The list is applied <em>inbound</em> on the guest sub-interface, so guest traffic is checked the moment it reaches the router. Order matters: the deny lines come first, DHCP is allowed so guests can still get an address, and everything else (the internet) is allowed last.</p>
+
+  <h3>Router admin: SSH only, staff only, with a lockout</h3>
+<pre><code>hostname KA-R1
+ip domain-name kestrel.local
+crypto key generate rsa general-keys modulus 2048
+ip ssh version 2
+username netadmin privilege 15 secret &lt;hidden&gt;
+enable secret &lt;hidden&gt;
+service password-encryption
+security passwords min-length 10
+login block-for 120 attempts 3 within 60
+banner motd ^Authorised access only. Activity is monitored.^
+!
+ip access-list standard MGMT-ONLY
+ permit 192.168.10.0 0.0.0.255
+ deny any
+line vty 0 4
+ login local
+ transport input ssh
+ access-class MGMT-ONLY in
+ exec-timeout 5 0
+line con 0
+ login local
+ exec-timeout 5 0</code></pre>
+  <ul>
+    <li><strong>SSH version 2 only:</strong> Telnet sends passwords in plain text, so it is switched off.</li>
+    <li><strong>Only the staff network</strong> can even open a login prompt (<code>access-class</code>), and guests are blocked from ports 22 and 23 by the guest ACL as well.</li>
+    <li><strong>Brute-force protection:</strong> 3 failed logins within 60 seconds blocks all logins for 2 minutes.</li>
+    <li><strong>Idle sessions close after 5 minutes</strong>, and passwords are stored hashed (<code>secret</code>), not in plain text.</li>
+  </ul>
+
+  <h3>Switch ports: only the right device</h3>
+<pre><code>interface range fa0/1, fa0/3, fa0/5
+ spanning-tree portfast
+ switchport port-security
+ switchport port-security maximum 1
+ switchport port-security mac-address sticky
+ switchport port-security violation shutdown</code></pre>
+  <p>Each staff port learns the MAC address of the first device it sees and saves it (<code>sticky</code>). Any other device on that port shuts the port down. The guest port uses <code>restrict</code> instead, which drops the unknown device's traffic and logs it without taking the port down, since visitors change often.</p>
+
+  <h2>4. Testing it: attacking my own network</h2>
+  <p>Configuration is only half the job, so I tried to break each control.</p>
+
+  <h3>Test 1: can a guest reach a staff PC?</h3>
+<pre><code>C:\&gt;ping 192.168.10.21     (from the guest laptop)
+Reply from 192.168.20.1: Destination host unreachable.
+Reply from 192.168.20.1: Destination host unreachable.
+Reply from 192.168.20.1: Destination host unreachable.
+Reply from 192.168.20.1: Destination host unreachable.
+    Packets: Sent = 4, Received = 0, Lost = 4 (100% loss)
+
+C:\&gt;ping 192.168.20.1      (its own gateway)
+Reply from 192.168.20.1: bytes=32 time&lt;1ms TTL=255  (x4)
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)</code></pre>
+  <p class="pass">Blocked. The second ping matters: it proves the guest network itself works, so the block comes from the ACL, not from a broken link.</p>
+
+  <h3>Test 2: password guessing over SSH</h3>
+<pre><code>C:\&gt;ssh -l netadmin 192.168.10.1     (from a staff PC)
+Password:
+% Login invalid
+Password:
+% Login invalid
+Password:
+[Connection to 192.168.10.1 closed by foreign host]
+
+C:\&gt;ssh -l netadmin 192.168.10.1     (straight away)
+% Connection refused by remote host</code></pre>
+  <p class="pass">After 3 wrong passwords the router dropped the session and then refused every new login for 2 minutes, which makes guessing a password impractical.</p>
+
+  <h3>Test 3: Telnet</h3>
+<pre><code>C:\&gt;telnet 192.168.10.1
+Trying 192.168.10.1 ...Open
+[Connection to 192.168.10.1 closed by foreign host]</code></pre>
+  <p class="pass">Refused. The router closes the connection before ever showing a login prompt, so no password can be sent in plain text.</p>
+
+  <h3>Test 4: a stranger plugs into a staff port</h3>
+  <p>I unplugged PC1 and connected a different laptop to its switch port, as someone might at an empty desk. The laptop asked for an address and never got one. The switch log:</p>
+<pre><code>%PM-4-ERR_DISABLE: psecure-violation error detected on Fa0/3, putting Fa0/3 in err-disable state.
+%PORT_SECURITY-2-PSECURE_VIOLATION: Security violation occurred, caused by MAC address
+0090.2B86.24CD on port FastEthernet0/3.
+
+KA-SW1#show port-security interface fa0/3
+Port Security              : Enabled
+Port Status                : Secure-shutdown
+Violation Mode             : Shutdown
+Maximum MAC Addresses      : 1
+Sticky MAC Addresses       : 1
+Last Source Address:Vlan   : 0090.2B86.24CD:10
+Security Violation Count   : 1</code></pre>
+  <p class="pass">Port shut down and the intruder's MAC address logged.</p>
+  <p>To restore service I reconnected PC1 and reset the port (<code>shutdown</code> then <code>no shutdown</code>), and PC1 got its usual address back.</p>
+
+  <h3>Test 5: can both networks reach the internet?</h3>
+<pre><code>C:\&gt;ping 198.51.100.10     (from staff PC0)
+Reply from 198.51.100.10: bytes=32 time&lt;1ms TTL=126  (x4)
+    Packets: Sent = 4, Received = 4, Lost = 0 (0% loss)</code></pre>
+  <p class="pass">Staff reach the internet. The guest laptop also opened <code>http://198.51.100.10</code> in its browser and loaded the server's home page.</p>
+  <p>Because the ISP router has no route back to 192.168.x.x, these replies can only return through the office router's NAT. So one test proves the routing, the default route and the address translation together, and it shows guests still get internet even though they're cut off from staff. (The very first ping lost 2 packets while the routers learned each other's hardware addresses with ARP; every ping after that was 4 of 4.)</p>
+
+  <h2>5. The gap testing found</h2>
+  <p>While I was looking at the switch after test 4, I realised I had hardened the router but <strong>never set any password on the switch</strong>. Anyone with a console cable could have walked up and reconfigured it, for example moving their own port into the staff VLAN. I fixed it:</p>
+<pre><code>enable secret &lt;hidden&gt;
+username netadmin privilege 15 secret &lt;hidden&gt;
+service password-encryption
+line con 0
+ login local
+ exec-timeout 5 0
+line vty 0 15
+ transport input none</code></pre>
+  <p>The switch now needs a login on its console and accepts no remote logins at all, since nothing needs to manage it over the network.</p>
+
+  <h2>6. Results</h2>
+  <div class="scroll"><table>
+    <tr><th>Control</th><th>Test</th><th>Result</th></tr>
+    <tr><td>Guest ACL</td><td>Guest pings a staff PC</td><td class="pass">Blocked (0 of 4 replies)</td></tr>
+    <tr><td>Guest network works</td><td>Guest pings its gateway</td><td class="pass">4 of 4 replies</td></tr>
+    <tr><td>Login lockout</td><td>3 wrong SSH passwords</td><td class="pass">Session dropped, logins refused for 2 minutes</td></tr>
+    <tr><td>SSH only</td><td>Telnet to the router</td><td class="pass">Closed with no login prompt</td></tr>
+    <tr><td>Port security</td><td>Rogue laptop on a staff port</td><td class="pass">Port shut down, MAC logged</td></tr>
+    <tr><td>NAT to the internet</td><td>Staff ping and guest web page to 198.51.100.10</td><td class="pass">4 of 4 replies, page loaded</td></tr>
+    <tr><td>Switch admin access</td><td>Review after testing</td><td>Gap found (no password) and fixed</td></tr>
+  </table></div>
+
+  <h2>7. Problems I hit</h2>
+  <ul>
+    <li><strong>Switch port numbers didn't match my plan.</strong> The cable menu in Packet Tracer only lists free ports, so the list shifted as I connected devices and PC1 landed on Fa0/3 instead of Fa0/2. Fix: I checked which ports were actually up (<code>show interfaces status</code> and the link-up messages) and built the VLAN and port-security config around the real ports, not the plan.</li>
+    <li><strong>Commands typed in user mode failed.</strong> <code>show port-security</code> returned "Invalid input" because I was at the <code>&gt;</code> prompt. It needs privileged mode (<code>enable</code>, prompt <code>#</code>).</li>
+    <li><strong>I locked myself out of my own console.</strong> After the hardening, the router asked for a username and password on the console too, and the login timed out after 5 minutes while I was away. That's the control working as intended, so rather than weaken it I loaded the NAT settings as a config file through Packet Tracer's "merge running config" option and saved it.</li>
+    <li><strong><code>no ip http server</code> was rejected</strong> by this router image in Packet Tracer. It's harmless here because the simulated router doesn't run a web server, but on real hardware I would make sure the HTTP management page is off.</li>
+  </ul>
+
+  <h2>8. What I'd add next</h2>
+  <ul>
+    <li><strong>Send logs somewhere central:</strong> forward router and switch logs (syslog) to a server, so a port-security violation raises an alert in a SIEM like my Splunk lab instead of sitting in the switch's buffer.</li>
+    <li><strong>DHCP snooping and Dynamic ARP Inspection</strong> on the switch, to stop a rogue DHCP server or ARP spoofing inside a VLAN.</li>
+    <li><strong>Automatic recovery</strong> for err-disabled ports after a set time, plus a note in the runbook on how staff report a locked port.</li>
+    <li><strong>Wireless:</strong> put the guest network on a real access point with WPA3 and client isolation.</li>
+  </ul>
+
+  <h2>9. What I learned</h2>
+  <ul>
+    <li>Segmentation is the cheapest big win: once guests are in their own VLAN, one ACL line keeps them away from everything that matters.</li>
+    <li>Always prove a block with a matching "allowed" test. A failed ping on its own could just mean a broken network.</li>
+    <li>Testing finds what reviewing misses. I only noticed the unprotected switch because I was poking at it during a test.</li>
+  </ul>
+</main>
+
+<footer>
+  <a href="../index.html#writeups">&larr; Back to all writeups</a> · Medha Holla
+</footer>
+
+<script>
+  (function () {
+    var btn = document.getElementById('themeBtn'), root = document.documentElement;
+    function label() { btn.textContent = root.getAttribute('data-theme') === 'dark' ? 'Light' : 'Dark'; }
+    label();
+    btn.addEventListener('click', function () {
+      var dark = root.getAttribute('data-theme') !== 'dark';
+      if (dark) root.setAttribute('data-theme', 'dark'); else root.removeAttribute('data-theme');
+      try { localStorage.setItem('mh-theme', dark ? 'dark' : 'light'); } catch (e) {}
+      label();
+    });
+  })();
+</script>
+</body>
+</html>
